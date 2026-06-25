@@ -2,28 +2,28 @@
 <html>
 <head>
 <style>
-  body { margin:0; font-family: -apple-system, "Trebuchet MS", Arial, sans-serif; background:#fff; }
-  .widget-wrap { max-width:420px; border:1px solid #e0e3eb; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
-  .header { background:#C8102E; color:#fff; padding:14px 16px; }
-  .symbol-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-  .logo { width:22px; height:22px; object-fit:contain; background:#fff; border-radius:4px; padding:2px; }
-  .label { font-size:13px; font-weight:600; opacity:0.95; letter-spacing:0.3px; }
+  html, body { margin:0; padding:0; font-family: -apple-system, "Trebuchet MS", Arial, sans-serif; background:#fff; width:100%; height:100%; }
+  .widget-wrap { width:100%; border:1px solid #e0e3eb; box-sizing:border-box; }
+  .header { background:#C8102E; color:#fff; padding:16px 20px; }
+  .symbol-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .logo { width:44px; height:44px; object-fit:contain; background:#fff; border-radius:50%; padding:4px; }
+  .label { font-size:14px; font-weight:600; opacity:0.95; letter-spacing:0.3px; }
   .price-row { display:flex; align-items:baseline; gap:10px; }
-  .price { font-size:26px; font-weight:700; }
-  .change { font-size:13px; font-weight:600; padding:2px 6px; border-radius:4px; }
+  .price { font-size:30px; font-weight:700; }
+  .change { font-size:14px; font-weight:600; padding:2px 8px; border-radius:4px; }
   .up { background:rgba(38,166,154,0.25); color:#aef0e3; }
   .down { background:rgba(239,83,80,0.25); color:#ffd2d0; }
-  .timestamp { font-size:11px; opacity:0.75; margin-top:6px; }
-  #chart-container { background:#fff; }
+  .timestamp { font-size:12px; opacity:0.75; margin-top:6px; }
+  #chart-container { background:#fff; width:100%; height:400px; }
 </style>
 </head>
 <body>
   <div class="widget-wrap">
     <div class="header">
-     <div class="symbol-row">
-  <img src="./logo.png" alt="Petra Energy" class="logo">
-  <div class="label">PENERGY · Bursa Malaysia (5133.KL)</div>
-</div>
+      <div class="symbol-row">
+        <img src="./logo.png" alt="Petra Energy" class="logo">
+        <div class="label">PENERGY · Bursa Malaysia (5133.KL)</div>
+      </div>
       <div class="price-row">
         <div class="price" id="price">--</div>
         <div class="change" id="change">--</div>
@@ -65,9 +65,10 @@
           close: quote.close[i]
         })).filter(c => c.open !== null && c.close !== null);
 
-        const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
-          width: 420,
-          height: 260,
+        const container = document.getElementById('chart-container');
+        const chart = LightweightCharts.createChart(container, {
+          width: container.clientWidth,
+          height: container.clientHeight,
           layout: { background: { color: '#ffffff' }, textColor: '#787b86' },
           grid: {
             vertLines: { color: '#f0f3fa' },
@@ -94,7 +95,7 @@
         chart.timeScale().fitContent();
 
         window.addEventListener('resize', () => {
-          chart.applyOptions({ width: document.getElementById('chart-container').clientWidth });
+          chart.applyOptions({ width: container.clientWidth, height: container.clientHeight });
         });
       })
       .catch((err) => {
