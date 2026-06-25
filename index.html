@@ -18,7 +18,7 @@
     <div class="change" id="change"></div>
   </div>
   <script>
-    fetch('https://query1.finance.yahoo.com/v8/finance/chart/5133.KL')
+  fetch('https://api.allorigins.win/raw?url=https://query1.finance.yahoo.com/v8/finance/chart/5133.KL')
       .then(res => res.json())
       .then(data => {
         const meta = data.chart.result[0].meta;
