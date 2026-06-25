@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  html, body { margin:0; padding:0; font-family: -apple-system, "Trebuchet MS", Arial, sans-serif; background:#fff; }
+  .wrap { width:100%; max-width:480px; border:1px solid #e0e3eb; border-radius:8px; overflow:hidden; }
+  .title-bar { background:#C8102E; color:#fff; padding:10px 16px; font-size:13px; font-weight:700; letter-spacing:0.3px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { text-align:left; padding:8px 16px; color:#787b86; font-weight:600; font-size:11px; text-transform:uppercase; border-bottom:1px solid #f0f3fa; }
+  thead th.num { text-align:right; }
+  .group-row td { padding:8px 16px 4px; color:#9ca3af; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; background:#fafbfc; }
+  tbody tr.data-row { border-bottom:1px solid #f5f6f8; cursor:default; }
+  tbody tr.data-row:hover { background:#fafbfc; }
+  td { padding:9px 16px; }
+  .sym-cell { display:flex; align-items:center; gap:8px; }
+  .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .sym-name { font-weight:600; color:#131722; }
+  .sym-full { font-size:11px; color:#9ca3af; display:block; }
+  .num { text-align:right; font-weight:600; color:#131722; white-space:nowrap; }
+  .chg { text-align:right; font-weight:600; white-space:nowrap; }
+  .up { color:#089981; }
+  .down { color:#f23645; }
+  .flat { color:#787b86; }
+  .highlight-row { background:#fff5f5; }
+  .timestamp { padding:8px 16px; font-size:10px; color:#9ca3af; border-top:1px solid #f0f3fa; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title-bar">PENERGY WATCHLIST · O&amp;G PEERS &amp; GLOBAL MAJORS</div>
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th class="num">Last</th><th class="num">Chg</th><th class="num">Chg%</th></tr>
+      </thead>
+      <tbody id="table-body">
+        <tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:20px;">Loading...</td></tr>
+      </tbody>
+    </table>
+    <div class="timestamp" id="timestamp"></div>
+  </div>
+
+  <script>
+    const groups = [
+      { label: "Bursa O&G Peers", items: [
+        { sym: "5133.KL", name: "PENERGY", dotColor: "#C8102E", highlight: true },
+        { sym: "5141.KL", name: "DAYANG", dotColor: "#1f6feb" },
+        { sym: "5243.KL", name: "VELESTO", dotColor: "#8957e5" },
+        { sym: "7250.KL", name: "UZMA", dotColor: "#db6d28" },
+        { sym: "5142.KL", name: "WASCO", dotColor: "#2da44e" },
+        { sym: "0034.KL", name: "CARIMIN", dotColor: "#cf222e" }
+      ]},
+      { label: "Global Majors", items: [
+        { sym: "XOM", name: "EXXONMOBIL", dotColor: "#1f2937" },
+        { sym: "SHEL", name: "SHELL", dotColor: "#fbbf24" },
+        { sym: "CVX", name: "CHEVRON", dotColor: "#0ea5e9" }
+      ]}
+    ];
+
+    fetch('./watchlist.json')
+      .then(res => res.json())
+      .then(dataArr => {
+        const bySymbol = {};
+        dataArr.forEach(d => {
+          try {
+            const meta = d.chart.result[0].meta;
+            bySymbol[meta.symbol] = meta;
+          } catch(e) {}
+        });
+
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        let latestTime = 0;
+
+        groups.forEach(group => {
+          const groupRow = document.createElement('tr');
+          groupRow.className = 'group-row';
+          groupRow.innerHTML = `<td colspan="4">${group.label}</td>`;
+          tbody.appendChild(groupRow);
+
+          group.items.forEach(item => {
+            const meta = bySymbol[item.sym];
+            const row = document.createElement('tr');
+            row.className = 'data-row' + (item.highlight ? ' highlight-row' : '');
+
+            if (!meta) {
+              row.innerHTML = `<td colspan="4">${item.name} — unavailable</td>`;
+              tbody.appendChild(row);
+              return;
+            }
+
+            if (meta.regularMarketTime > latestTime) latestTime = meta.regularMarketTime;
+
+            const price = meta.regularMarketPrice;
+            const prevClose = meta.previousClose || meta.chartPreviousClose;
+            const change = price - prevClose;
+            const pct = prevClose ? (change / prevClose * 100) : 0;
+            const dir = change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
+            const sign = change > 0 ? '+' : '';
+            const decimals = price < 10 ? 3 : 2;
+
+            row.innerHTML = `
+              <td><div class="sym-cell"><span class="dot" style="background:${item.dotColor}"></span>
+                <div><span class="sym-name">${item.name}</span><span class="sym-full">${item.sym}</span></div>
+              </div></td>
+              <td class="num">${price.toFixed(decimals)}</td>
+              <td class="chg ${dir}">${sign}${change.toFixed(decimals)}</td>
+              <td class="chg ${dir}">${sign}${pct.toFixed(2)}%</td>
+            `;
+            tbody.appendChild(row);
+          });
+        });
+
+        if (latestTime) {
+          const now = new Date(latestTime * 1000);
+          document.getElementById('timestamp').innerText =
+            `Last updated: ${now.toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kuala_Lumpur' })}`;
+        }
+      })
+      .catch(err => {
+        document.getElementById('table-body').innerHTML =
+          '<tr><td colspan="4" style="text-align:center;color:#f23645;padding:20px;">Unable to load watchlist</td></tr>';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
