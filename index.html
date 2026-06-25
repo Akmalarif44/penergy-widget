@@ -6,6 +6,7 @@
   .widget-wrap { max-width:420px; border:1px solid #e0e3eb; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
   .header { background:#C8102E; color:#fff; padding:14px 16px; }
   .symbol-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .logo { width:22px; height:22px; object-fit:contain; background:#fff; border-radius:4px; padding:2px; }
   .label { font-size:13px; font-weight:600; opacity:0.95; letter-spacing:0.3px; }
   .price-row { display:flex; align-items:baseline; gap:10px; }
   .price { font-size:26px; font-weight:700; }
@@ -19,9 +20,10 @@
 <body>
   <div class="widget-wrap">
     <div class="header">
-      <div class="symbol-row">
-        <div class="label">PENERGY · Bursa Malaysia (5133.KL)</div>
-      </div>
+     <div class="symbol-row">
+  <img src="./logo.png" alt="Petra Energy" class="logo">
+  <div class="label">PENERGY · Bursa Malaysia (5133.KL)</div>
+</div>
       <div class="price-row">
         <div class="price" id="price">--</div>
         <div class="change" id="change">--</div>
