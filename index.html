@@ -1,19 +1,37 @@
 <!DOCTYPE html>
 <html>
+<head>
+<style>
+  body { margin:0; font-family: Segoe UI, sans-serif; }
+  .widget { background:#C8102E; color:#fff; padding:12px 16px; border-radius:6px; max-width:260px; }
+  .label { font-size:12px; opacity:0.85; }
+  .price { font-size:22px; font-weight:600; margin:4px 0; }
+  .change { font-size:13px; }
+  .up { color:#9CFFB0; }
+  .down { color:#FFB3B3; }
+</style>
+</head>
 <body>
-  <div class="tradingview-widget-container">
-    <div class="tradingview-widget-container__widget"></div>
-    <script src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
-    {
-    "symbols": [["NASDAQ:AAPL|1D"]],
-    "chartOnly": false,
-    "width": "100%",
-    "height": "300",
-    "locale": "en",
-    "colorTheme": "light",
-    "autosize": false
-    }
-    </script>
+  <div class="widget">
+    <div class="label">PENERGY (5133.KL)</div>
+    <div class="price" id="price">Loading...</div>
+    <div class="change" id="change"></div>
   </div>
+  <script>
+  fetch('./data.json')
+      .then(res => res.json())
+      .then(data => {
+        const meta = data.chart.result[0].meta;
+        const price = meta.regularMarketPrice;
+        const prevClose = meta.previousClose || meta.chartPreviousClose;
+        const change = price - prevClose;
+        const pct = (change / prevClose * 100).toFixed(2);
+        document.getElementById('price').innerText = `RM ${price.toFixed(2)}`;
+        const changeEl = document.getElementById('change');
+        changeEl.innerText = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${pct}%)`;
+        changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
+      })
+      .catch(() => { document.getElementById('price').innerText = 'Unable to load'; });
+  </script>
 </body>
 </html>
