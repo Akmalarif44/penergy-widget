@@ -2,23 +2,34 @@
 <html>
 <head>
 <style>
-  body { margin:0; font-family: Segoe UI, sans-serif; background:#fff; }
-  .widget { background:#C8102E; color:#fff; padding:12px 16px; border-radius:6px 6px 0 0; max-width:400px; }
-  .label { font-size:12px; opacity:0.85; }
-  .price { font-size:22px; font-weight:600; margin:4px 0; }
-  .change { font-size:13px; }
-  .up { color:#9CFFB0; }
-  .down { color:#FFB3B3; }
-  #chart-container { max-width:400px; border:1px solid #eee; border-top:none; border-radius:0 0 6px 6px; }
+  body { margin:0; font-family: -apple-system, "Trebuchet MS", Arial, sans-serif; background:#fff; }
+  .widget-wrap { max-width:420px; border:1px solid #e0e3eb; border-radius:8px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.08); }
+  .header { background:#C8102E; color:#fff; padding:14px 16px; }
+  .symbol-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .label { font-size:13px; font-weight:600; opacity:0.95; letter-spacing:0.3px; }
+  .price-row { display:flex; align-items:baseline; gap:10px; }
+  .price { font-size:26px; font-weight:700; }
+  .change { font-size:13px; font-weight:600; padding:2px 6px; border-radius:4px; }
+  .up { background:rgba(38,166,154,0.25); color:#aef0e3; }
+  .down { background:rgba(239,83,80,0.25); color:#ffd2d0; }
+  .timestamp { font-size:11px; opacity:0.75; margin-top:6px; }
+  #chart-container { background:#fff; }
 </style>
 </head>
 <body>
-  <div class="widget">
-    <div class="label">PENERGY (5133.KL)</div>
-    <div class="price" id="price">Loading...</div>
-    <div class="change" id="change"></div>
+  <div class="widget-wrap">
+    <div class="header">
+      <div class="symbol-row">
+        <div class="label">PENERGY · Bursa Malaysia (5133.KL)</div>
+      </div>
+      <div class="price-row">
+        <div class="price" id="price">--</div>
+        <div class="change" id="change">--</div>
+      </div>
+      <div class="timestamp" id="timestamp"></div>
+    </div>
+    <div id="chart-container"></div>
   </div>
-  <div id="chart-container"></div>
 
   <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
   <script>
@@ -30,17 +41,20 @@
         const timestamps = result.timestamp;
         const quote = result.indicators.quote[0];
 
-        // Price box
         const price = meta.regularMarketPrice;
         const prevClose = meta.previousClose || meta.chartPreviousClose;
         const change = price - prevClose;
         const pct = (change / prevClose * 100).toFixed(2);
-        document.getElementById('price').innerText = `RM ${price.toFixed(2)}`;
+
+        document.getElementById('price').innerText = `RM ${price.toFixed(3)}`;
         const changeEl = document.getElementById('change');
-        changeEl.innerText = `${change >= 0 ? '+' : ''}${change.toFixed(2)} (${pct}%)`;
+        changeEl.innerText = `${change >= 0 ? '+' : ''}${change.toFixed(3)} (${pct}%)`;
         changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
 
-        // Build candle data
+        const now = new Date(meta.regularMarketTime * 1000);
+        document.getElementById('timestamp').innerText =
+          `As of ${now.toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kuala_Lumpur' })}`;
+
         const candles = timestamps.map((t, i) => ({
           time: t,
           open: quote.open[i],
@@ -49,14 +63,21 @@
           close: quote.close[i]
         })).filter(c => c.open !== null && c.close !== null);
 
-        // Render chart
         const chart = LightweightCharts.createChart(document.getElementById('chart-container'), {
-          width: 400,
-          height: 220,
-          layout: { background: { color: '#ffffff' }, textColor: '#333' },
-          grid: { vertLines: { color: '#f0f0f0' }, horzLines: { color: '#f0f0f0' } },
-          timeScale: { timeVisible: false, borderColor: '#ddd' },
-          rightPriceScale: { borderColor: '#ddd' }
+          width: 420,
+          height: 260,
+          layout: { background: { color: '#ffffff' }, textColor: '#787b86' },
+          grid: {
+            vertLines: { color: '#f0f3fa' },
+            horzLines: { color: '#f0f3fa' }
+          },
+          crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+            vertLine: { color: '#C8102E', width: 1, style: 2, labelBackgroundColor: '#C8102E' },
+            horzLine: { color: '#C8102E', width: 1, style: 2, labelBackgroundColor: '#C8102E' }
+          },
+          timeScale: { borderColor: '#e0e3eb', timeVisible: true },
+          rightPriceScale: { borderColor: '#e0e3eb' }
         });
 
         const candleSeries = chart.addCandlestickSeries({
@@ -69,6 +90,10 @@
 
         candleSeries.setData(candles);
         chart.timeScale().fitContent();
+
+        window.addEventListener('resize', () => {
+          chart.applyOptions({ width: document.getElementById('chart-container').clientWidth });
+        });
       })
       .catch((err) => {
         document.getElementById('price').innerText = 'Unable to load';
