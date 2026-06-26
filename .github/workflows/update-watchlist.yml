@@ -18,7 +18,7 @@ jobs:
       - name: Fetch all symbols
         run: |
           mkdir -p data
-          declare -a symbols=("5133.KL" "5141.KL" "5243.KL" "7250.KL" "5142.KL" "0034.KL" "XOM" "SHEL" "CVX")
+          declare -a symbols=("5133.KL" "6033.KL" "5141.KL" "5243.KL" "7250.KL" "5142.KL" "0034.KL" "XOM" "SHEL" "CVX")
           echo "[" > watchlist.json
           first=true
           for sym in "${symbols[@]}"; do
