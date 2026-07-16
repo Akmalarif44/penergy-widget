@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE-PETRA Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --petra-red: #B41F2E;
+    --petra-red-dark: #841720;
+    --navy: #0C1B26;
+    --navy-2: #142B3B;
+    --amber: #D98E2B;
+    --paper: #FBF9F3;
+    --cream: #F4F0E6;
+    --ink: #1B1F23;
+    --steel: #5A6B78;
+    --line: #E2DAC8;
+    --good-green: #1E7A4C;
+    --c-hsse: #B41F2E;
+    --c-it: #1F5FA8;
+    --c-hr: #7A3FA0;
+    --c-social: #D98E2B;
+    --c-corp: #1E7A4C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--cream);}
+  body{font-family:'IBM Plex Sans', system-ui, sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased; font-size:14px;}
+  a{color:inherit; text-decoration:none;}
+  .page{max-width:1280px; margin:0 auto; background:var(--cream);}
+  img{max-width:100%; display:block;}
+
+  .util-bar{
+    background:var(--navy); color:#8496A2; font-size:11px;
+    display:flex; align-items:center; justify-content:flex-end; gap:16px;
+    padding:5px 26px;
+  }
+  .util-bar a{color:#B9C4CC;}
+  .util-bar a:hover{color:#fff;}
+
+  .nav{
+    background:#fff; border-bottom:1px solid var(--line);
+    padding:12px 26px; display:flex; align-items:center; gap:22px;
+  }
+  .nav-brand{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .nav-mark{
+    width:36px;height:36px; background:var(--petra-red); border-radius:3px;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff; font-family:'Archivo Black'; font-size:16px;
+  }
+  .nav-word{font-family:'Archivo Black'; font-size:16px; color:var(--navy); letter-spacing:0.01em; white-space:nowrap;}
+  .nav-search{
+    flex:1; max-width:440px; display:flex; align-items:center; gap:8px;
+    background:var(--cream); border:1px solid var(--line); border-radius:20px; padding:8px 16px;
+  }
+  .nav-search input{background:transparent; border:none; outline:none; color:var(--ink); font-size:13px; width:100%;}
+  .nav-search input::placeholder{color:var(--steel);}
+  .nav-search svg{width:15px;height:15px; color:var(--steel); flex-shrink:0;}
+  .nav-right{display:flex; align-items:center; gap:14px; margin-left:auto; flex-shrink:0;}
+  .nav-avatar{
+    width:30px;height:30px;border-radius:50%; background:var(--navy); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; font-family:'IBM Plex Mono';
+  }
+  .nav-bell{position:relative; width:20px; height:20px; color:var(--steel); cursor:pointer;}
+  .nav-bell svg{width:20px;height:20px;}
+  .nav-bell .dot{position:absolute; top:-2px; right:-2px; width:8px; height:8px; border-radius:50%; background:var(--petra-red); border:1.5px solid #fff;}
+  .greet-bar{
+    background:#fff; border-bottom:1px solid var(--line); padding:9px 26px;
+    display:flex; align-items:center; justify-content:space-between; font-size:12.5px;
+  }
+  .greet-text{color:var(--steel);}
+  .greet-text b{color:var(--ink);}
+  .greet-meta{color:var(--steel); font-family:'IBM Plex Mono'; font-size:11px;}
+  @media (max-width:820px){ .nav-search{display:none;} }
+
+  .tabs{
+    background:#fff; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:4px; padding:0 22px;
+    overflow-x:auto; white-space:nowrap;
+  }
+  .tab{
+    display:flex; align-items:center; gap:6px; padding:11px 14px;
+    font-size:12.5px; font-weight:600; color:var(--steel);
+    border-bottom:2.5px solid transparent; cursor:pointer; flex-shrink:0;
+  }
+  .tab svg{width:14px;height:14px;}
+  .tab.active{color:var(--ink); border-bottom-color:var(--petra-red);}
+  .tab:hover{color:var(--ink);}
+
+  .marquee-wrap{
+    background:var(--navy); overflow:hidden; position:relative;
+    display:flex; align-items:center; padding:8px 0;
+  }
+  .marquee-label{
+    flex-shrink:0; background:var(--petra-red); color:#fff; font-family:'IBM Plex Mono';
+    font-size:10px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    padding:4px 14px; margin-left:0; border-radius:0 3px 3px 0; z-index:2; position:relative;
+    display:flex; align-items:center; gap:6px;
+  }
+  .live-dot{width:6px;height:6px;border-radius:50%; background:#fff; animation:pulseDot 1.6s ease-in-out infinite;}
+  @keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+  @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+  .marquee-track{
+    display:flex; gap:34px; padding-left:20px; flex-shrink:0;
+    animation: scrollLeft 32s linear infinite;
+  }
+  .marquee-wrap:hover .marquee-track{ animation-play-state: paused; }
+  @keyframes scrollLeft{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+  .marquee-item{color:#D7DEE3; font-size:12px; white-space:nowrap; display:flex; align-items:center; gap:8px;}
+  .marquee-item b{color:#fff;}
+  @media (prefers-reduced-motion: reduce){ .marquee-track{ animation:none; } }
+
+  .main{display:grid; grid-template-columns:2.15fr 1fr; gap:18px; padding:18px 22px;}
+  @media (max-width:900px){ .main{grid-template-columns:1fr;} }
+
+  .hero{
+    position:relative; border-radius:6px; overflow:hidden; min-height:400px;
+    display:flex; align-items:flex-end;
+    background:var(--navy); box-shadow:0 1px 4px rgba(12,27,38,0.12);
+  }
+  .hero-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .hero-scrim{position:absolute; inset:0; background:linear-gradient(0deg, rgba(6,14,20,0.95) 0%, rgba(6,14,20,0.55) 45%, rgba(6,14,20,0.05) 75%);}
+  .hero-body{position:relative; z-index:1; padding:24px 26px; width:100%;}
+  .hero-badge{display:inline-flex; align-items:center; gap:7px; margin-bottom:12px;}
+  .dept-dot{width:9px; height:9px; border-radius:50%; flex-shrink:0;}
+  .hero-badge-text{font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:0.07em; text-transform:uppercase; color:#fff; font-weight:600;}
+  .hero-time{font-size:10.5px; color:#9FB0BB; margin-left:6px;}
+  .hero-title{font-family:'Archivo Black'; font-size:28px; line-height:1.16; color:#fff; margin:0 0 8px; max-width:660px;}
+  .hero-desc{font-size:13px; color:#CBD4D9; max-width:580px; margin:0; line-height:1.5;}
+  .hero-nav{position:absolute; right:18px; bottom:18px; z-index:2; display:flex; gap:7px;}
+  .hero-btn{
+    width:28px;height:28px; border-radius:50%; border:1px solid rgba(255,255,255,0.35);
+    background:rgba(255,255,255,0.10); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .hero-btn svg{width:13px;height:13px;}
+  .hero-dots{position:absolute; left:26px; bottom:20px; z-index:2; display:flex; gap:5px;}
+  .hero-dot{width:16px;height:3px;border-radius:2px; background:rgba(255,255,255,0.3); cursor:pointer; transition:background .15s;}
+  .hero-dot.active{background:#fff;}
+
+  .bento{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:12px;}
+  @media (max-width:640px){ .bento{grid-template-columns:1fr 1fr;} }
+  .b-card{
+    background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden;
+    display:flex; flex-direction:column; transition:box-shadow .15s, transform .15s;
+  }
+  .b-card:hover{box-shadow:0 3px 10px rgba(12,27,38,0.10); transform:translateY(-1px);}
+  .b-card.wide{grid-column:span 2;}
+  .b-card img{width:100%; height:120px; object-fit:cover;}
+  .b-card.wide img{height:150px;}
+  .b-body{padding:10px 12px 12px; flex:1; display:flex; flex-direction:column;}
+  .b-badge{display:flex; align-items:center; gap:5px; margin-bottom:5px;}
+  .b-badge-text{font-size:10px; font-weight:700; color:var(--steel); text-transform:uppercase; letter-spacing:0.04em;}
+  .b-title{font-size:12.5px; font-weight:600; line-height:1.35; margin:0; flex:1;}
+  .b-card.wide .b-title{font-size:14.5px;}
+  .b-time{font-size:10px; color:var(--steel); margin-top:6px;}
+
+  /* ---------- LEFT-COLUMN FILL: LTI COUNTER + POLL ---------- */
+  .fill-row{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;}
+  @media (max-width:640px){ .fill-row{grid-template-columns:1fr;} }
+
+  .lti-card{
+    background: linear-gradient(150deg, var(--navy) 0%, var(--navy-2) 100%);
+    border-radius:6px; padding:18px; color:#fff; position:relative; overflow:hidden;
+  }
+  .lti-eyebrow{font-family:'IBM Plex Mono'; font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:#7C8D99; margin:0 0 8px; display:flex; align-items:center; gap:6px;}
+  .lti-shield{width:13px;height:13px; color:var(--good-green);}
+  .lti-number{font-family:'Archivo Black'; font-size:44px; line-height:1; color:#fff;}
+  .lti-label{font-size:11.5px; color:#B9C4CC; margin-top:4px; max-width:200px; line-height:1.4;}
+  .lti-record{
+    margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.12);
+    font-size:10px; color:#7C8D99; display:flex; justify-content:space-between;
+  }
+  .lti-record b{color:#D7DEE3;}
+
+  .poll-card{background:#fff; border:1px solid var(--line); border-radius:6px; padding:16px;}
+  .poll-eyebrow{font-family:'IBM Plex Mono'; font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--petra-red); margin:0 0 8px;}
+  .poll-q{font-size:13px; font-weight:700; line-height:1.35; margin:0 0 12px; color:var(--ink);}
+  .poll-opt{
+    display:block; width:100%; text-align:left; background:var(--cream); border:1px solid var(--line);
+    border-radius:5px; padding:9px 12px; margin-bottom:7px; font-size:12px; font-weight:600; color:var(--ink);
+    cursor:pointer; position:relative; overflow:hidden; transition:border-color .15s;
+  }
+  .poll-opt:hover{border-color:var(--petra-red);}
+  .poll-opt .fill-bar{
+    position:absolute; inset:0; background:var(--good-bg); width:0%; z-index:0; transition:width .5s ease-out;
+  }
+  .poll-opt .opt-content{position:relative; z-index:1; display:flex; justify-content:space-between; gap:8px;}
+  .poll-opt .opt-pct{font-family:'IBM Plex Mono'; color:var(--good-green); display:none;}
+  .poll-opt.voted .opt-pct{display:inline;}
+  .poll-opt.voted{cursor:default;}
+  .poll-meta{font-size:10.5px; color:var(--steel); margin-top:4px;}
+
+  .events-strip{
+    background:#fff; border:1px solid var(--line); border-radius:6px; margin-top:12px;
+    display:flex; overflow-x:auto;
+  }
+  .event-item{
+    display:flex; align-items:center; gap:10px; padding:12px 16px; flex-shrink:0;
+    border-right:1px solid var(--line); min-width:230px;
+  }
+  .event-item:last-child{border-right:none;}
+  .event-date{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    width:42px; height:42px; border-radius:5px; background:var(--cream); flex-shrink:0;
+  }
+  .event-date .d{font-family:'Archivo Black'; font-size:15px; color:var(--petra-red); line-height:1;}
+  .event-date .m{font-family:'IBM Plex Mono'; font-size:8.5px; color:var(--steel); text-transform:uppercase; margin-top:1px;}
+  .event-title{font-size:12px; font-weight:600; line-height:1.3;}
+  .event-sub{font-size:10px; color:var(--steel); margin-top:2px;}
+
+  .rail{display:flex; flex-direction:column; gap:14px;}
+  .card{background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+  .card-head{
+    display:flex; align-items:center; gap:8px; padding:10px 14px;
+    font-family:'Archivo Black'; font-size:11.5px; letter-spacing:0.02em; text-transform:uppercase;
+    color:var(--navy); border-bottom:1px solid var(--line);
+  }
+  .card-body{padding:4px 14px 10px;}
+
+  .tr-row{display:flex; align-items:baseline; gap:10px; padding:9px 0; border-top:1px solid var(--line);}
+  .tr-row:first-child{border-top:none;}
+  .tr-num{font-family:'Archivo Black'; font-size:16px; color:var(--line); width:20px; flex-shrink:0;}
+  .tr-body{flex:1; min-width:0;}
+  .tr-title{font-size:12px; font-weight:600; line-height:1.35;}
+
+  .wx-now{display:flex; align-items:center; justify-content:space-between; padding:8px 0 10px;}
+  .wx-now-left{display:flex; align-items:center; gap:10px;}
+  .wx-icon-lg{width:36px;height:36px; color:var(--petra-red); flex-shrink:0;}
+  .wx-city{font-size:13px; font-weight:700;}
+  .wx-cond{font-size:10.5px; color:var(--steel);}
+  .wx-temp-lg{font-family:'IBM Plex Mono'; font-size:24px; font-weight:600; color:var(--navy);}
+  .wx-strip{display:flex; justify-content:space-between; border-top:1px solid var(--line); padding-top:8px;}
+  .wx-strip-day{display:flex; flex-direction:column; align-items:center; gap:3px; font-size:9.5px; color:var(--steel);}
+  .wx-strip-day svg{width:16px;height:16px; color:var(--petra-red);}
+  .wx-strip-day b{color:var(--ink); font-size:10.5px;}
+  .wx-divider{border-top:1px solid var(--line); margin:10px 0 6px;}
+  .wx-site-label{font-size:10px; font-weight:700; color:var(--steel); text-transform:uppercase; letter-spacing:0.05em; margin:8px 0 2px;}
+
+  .stock-top{display:flex; align-items:flex-start; justify-content:space-between; padding-top:6px;}
+  .stock-price{font-family:'IBM Plex Mono'; font-size:24px; font-weight:600; color:var(--navy);}
+  .stock-chg{font-family:'IBM Plex Mono'; font-size:12px; font-weight:600; display:block; margin-top:2px;}
+  .stock-chg.up{color:var(--good-green);}
+  .stock-chg.down{color:var(--petra-red);}
+  .stock-code{font-size:10px; color:var(--steel);}
+  .mkt-status{display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; margin-top:3px;}
+  .mkt-dot{width:6px;height:6px;border-radius:50%;}
+  .mkt-status.open .mkt-dot{background:var(--good-green);}
+  .mkt-status.open{color:var(--good-green);}
+  .mkt-status.closed .mkt-dot{background:var(--steel);}
+  .mkt-status.closed{color:var(--steel);}
+  .stock-spark{flex-shrink:0;}
+  .stock-note{font-size:9.5px; color:var(--steel); margin-top:8px; padding-bottom:6px;}
+
+  .ql-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-bottom:8px; padding-top:4px;}
+  .ql-item{
+    display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center;
+    padding:11px 6px; border:1px solid var(--line); border-radius:6px; background:var(--cream); transition:border-color .15s;
+  }
+  .ql-item:hover{border-color:var(--petra-red);}
+  .ql-icon{
+    width:32px; height:32px; border-radius:50%; background:#fff; color:var(--petra-red);
+    display:flex; align-items:center; justify-content:center; border:1px solid var(--line);
+  }
+  .ql-icon svg{width:16px;height:16px;}
+  .ql-label{font-size:10.5px; font-weight:600; line-height:1.2;}
+
+  .tip-card{
+    background: linear-gradient(120deg, var(--petra-red) 0%, var(--petra-red-dark) 100%);
+    color:#fff; padding:14px; border-radius:6px;
+  }
+  .tip-eyebrow{font-family:'IBM Plex Mono'; font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:#F3C9CD; margin:0 0 6px;}
+  .tip-title{font-family:'Archivo Black'; font-size:14.5px; margin:0 0 6px;}
+  .tip-desc{font-size:11.5px; color:#F3D9DB; line-height:1.45; margin:0 0 10px;}
+  .tip-link{display:inline-block; font-size:11px; font-weight:600; color:#fff; background:rgba(255,255,255,0.16); padding:6px 12px; border-radius:20px;}
+
+  .section-head{display:flex; align-items:center; gap:10px; padding:4px 22px 2px; margin-top:4px;}
+  .section-head h2{font-family:'Archivo Black'; font-size:15px; margin:0; color:var(--navy);}
+  .section-line{flex:1; height:1px; background:var(--line);}
+  .grid2{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; padding:10px 22px 26px;}
+  @media (max-width:900px){ .grid2{grid-template-columns:1fr 1fr;} }
+  @media (max-width:560px){ .grid2{grid-template-columns:1fr;} }
+  .g-card{background:#fff; border:1px solid var(--line); border-radius:6px; overflow:hidden; display:flex; flex-direction:column; transition:box-shadow .15s, transform .15s;}
+  .g-card:hover{box-shadow:0 3px 10px rgba(12,27,38,0.10); transform:translateY(-1px);}
+  .g-card img{width:100%; height:120px; object-fit:cover;}
+  .g-card-body{padding:10px 12px 12px;}
+  .g-badge{display:flex; align-items:center; gap:5px; margin-bottom:6px;}
+  .g-badge-text{font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--steel);}
+  .g-title{font-size:12.5px; font-weight:600; line-height:1.35; margin:0 0 6px;}
+  .g-meta{font-size:10px; color:var(--steel);}
+
+  .footer{
+    background:var(--navy); color:#8496A2; padding:20px 26px; font-size:11px;
+    display:flex; flex-wrap:wrap; gap:18px; justify-content:space-between; align-items:center;
+  }
+  .footer-links{display:flex; gap:16px; flex-wrap:wrap;}
+  .footer-links a:hover{color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="util-bar">
+    <a href="#">Outlook</a><a href="#">Teams</a><a href="#">SharePoint</a><a href="#">IT Helpdesk</a>
+  </div>
+
+  <div class="nav">
+    <div class="nav-brand">
+      <div class="nav-mark">P</div>
+      <div class="nav-word">ONE-PETRA</div>
+    </div>
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search ONE-PETRA&hellip;">
+    </div>
+    <div class="nav-right">
+      <div class="nav-bell">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span class="dot"></span>
+      </div>
+      <div class="nav-avatar" id="navInitials">MK</div>
+    </div>
+  </div>
+
+  <div class="greet-bar">
+    <div class="greet-text" id="greetText">Good day, <b>Muhammad Akmalarif</b> &mdash; here's what's happening across ONE-PETRA today.</div>
+    <div class="greet-meta" id="greetDate">&mdash;</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="marquee-wrap">
+    <span class="marquee-label"><span class="live-dot"></span>Trending</span>
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+
+  <div class="main">
+    <div>
+      <div class="hero" id="hero">
+        <img class="hero-photo" id="heroPhoto" alt="">
+        <div class="hero-scrim"></div>
+        <div class="hero-body">
+          <span class="hero-badge">
+            <span class="dept-dot" id="heroDot"></span>
+            <span class="hero-badge-text" id="heroTag">Announcement</span>
+            <span class="hero-time" id="heroTime"></span>
+          </span>
+          <h1 class="hero-title" id="heroTitle">Loading&hellip;</h1>
+          <p class="hero-desc" id="heroDesc"></p>
+        </div>
+        <div class="hero-dots" id="heroDots"></div>
+        <div class="hero-nav">
+          <div class="hero-btn" id="heroPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div>
+          <div class="hero-btn" id="heroNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="bento" id="bento"></div>
+
+      <div class="fill-row">
+        <div class="lti-card">
+          <p class="lti-eyebrow">
+            <svg class="lti-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg>
+            HSSE &bull; Site Safety
+          </p>
+          <div class="lti-number" id="ltiNumber">0</div>
+          <div class="lti-label">Days without a Lost Time Incident across ONE-PETRA sites</div>
+          <div class="lti-record"><span>Best streak: <b>412 days</b></span><span id="ltiSince"></span></div>
+        </div>
+
+        <div class="poll-card">
+          <p class="poll-eyebrow">Quick Poll</p>
+          <p class="poll-q">Which ONE-PETRA update would you like to see more of?</p>
+          <div id="pollOptions"></div>
+          <div class="poll-meta" id="pollMeta">Tap an option to vote</div>
+        </div>
+      </div>
+
+      <div class="events-strip" id="eventsStrip"></div>
+    </div>
+
+    <div class="rail">
+      <div class="card">
+        <div class="card-head">Trending in ONE-PETRA</div>
+        <div class="card-body" id="trendBody"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Site Weather</div>
+        <div class="card-body" id="wxBody">
+          <div class="wx-now"><span class="wx-city">Loading&hellip;</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">PENERGY (5133)</div>
+        <div class="card-body">
+          <div class="stock-top">
+            <div>
+              <span class="stock-price" id="stockPrice">&mdash;</span>
+              <span class="stock-chg" id="stockChg"></span>
+              <div class="stock-code">Bursa Malaysia &bull; MYR</div>
+              <div class="mkt-status" id="mktStatus"><span class="mkt-dot"></span><span>&mdash;</span></div>
+            </div>
+            <svg class="stock-spark" id="stockSpark" width="90" height="34" viewBox="0 0 90 34"></svg>
+          </div>
+          <div class="stock-note" id="stockNote">Fetching live price&hellip;</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">Quick Links</div>
+        <div class="card-body"><div class="ql-grid" id="qlGrid"></div></div>
+      </div>
+
+      <div class="tip-card">
+        <p class="tip-eyebrow">Group IT &bull; Tip of the Day</p>
+        <p class="tip-title">IT Digest</p>
+        <p class="tip-desc">Daily rotating security &amp; Microsoft 365 tips for the whole team.</p>
+        <a class="tip-link" href="https://akmalarif44.github.io/penergy-widget/it-digest.html" target="_blank" rel="noopener">Open IT Digest &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head"><h2>More from ONE-PETRA</h2><div class="section-line"></div></div>
+  <div class="grid2" id="storyGrid"></div>
+
+  <div class="footer">
+    <div>&copy; <span id="fyear"></span> Petra Energy Berhad &bull; ONE-PETRA Intranet</div>
+    <div class="footer-links">
+      <a href="#">IT Helpdesk</a><a href="#">SAP Portal</a><a href="#">M365</a><a href="#">i-Petra / MIHCM</a><a href="#">Report an Issue</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const EVENTS = [
+  { day:"18", mon:"JUL", title:"HSSE Toolbox Talk", sub:"Site A &bull; 8:30 AM" },
+  { day:"22", mon:"JUL", title:"CNY Dinner Registration Closes", sub:"HR &bull; End of day" },
+  { day:"25", mon:"JUL", title:"Group IT Town Hall", sub:"Teams &bull; 3:00 PM" },
+  { day:"01", mon:"AUG", title:"Badminton Sign-ups Close", sub:"Sports & Rec Club" }
+];
+
+const POLL = {
+  question: "Which ONE-PETRA update would you like to see more of?",
+  options: [
+    { label: "HSSE safety tips", votes: 42 },
+    { label: "IT & Microsoft 365 tips", votes: 35 },
+    { label: "Department news", votes: 18 },
+    { label: "Social & events", votes: 27 }
+  ]
+};
+
+const DEPTS = {
+  hsse:  { label:"HSSE Workspace", color:"var(--c-hsse)" },
+  it:    { label:"Group IT",       color:"var(--c-it)" },
+  hr:    { label:"HR",             color:"var(--c-hr)" },
+  social:{ label:"Social & Community", color:"var(--c-social)" },
+  corp:  { label:"Corporate Comms", color:"var(--c-corp)" }
+};
+
+const TABS = [
+  { key:"home",   label:"Home",   icon:"home" },
+  { key:"hsse",   label:"HSSE",   icon:"shield" },
+  { key:"it",     label:"IT",     icon:"laptop" },
+  { key:"hr",     label:"HR",     icon:"people" },
+  { key:"dept",   label:"Departments", icon:"grid" },
+  { key:"dir",    label:"Directory",   icon:"chat" },
+  { key:"social", label:"Social & Community", icon:"heart" }
+];
+
+const TRENDING = [
+  "New IT Digest tip-of-the-day now live on ONE-PETRA",
+  "Petra Energy secures Banang Late Life Asset extension",
+  "HSSE: Working at Height checklist refreshed for Q3",
+  "Open enrollment for training programs closes Friday",
+  "Sports & Recreation Club badminton sign-ups open"
+];
+
+const HERO_STORIES = [
+  { dept:"hsse", title:"Preventing Back Injury & MSDs on Site", desc:"Refresh on safe lifting technique, posture, and critical risks to avoid during manual handling tasks.", time:"2h ago", photo:"Closed lock on laptop (49918711713).jpg" },
+  { dept:"it",   title:"New IT Digest Tip-of-the-Day Now Live", desc:"A daily rotating carousel covering M365, cybersecurity basics, and computer care — auto-updates every morning at 8AM.", time:"5h ago", photo:"Laptop computer monitor (Unsplash).jpg" },
+  { dept:"corp", title:"Petra Energy Continues Brownfield Services Growth", desc:"Latest updates on hook-up & commissioning, marine assets, and production operations across our sites.", time:"1d ago", photo:"Oil and gas pipeline.jpg" }
+];
+
+const BENTO = [
+  { dept:"hr", title:"Know Your Colleague: meet the new Commissioning Team", time:"3h ago", photo:"Work Meeting.jpg", wide:true },
+  { dept:"it", title:"USB drives found on-site? Hand them to IT, don't plug in", time:"6h ago", photo:"USB Stick.jpg" },
+  { dept:"social", title:"CNY dinner registration now open", time:"8h ago", photo:"Wireless network.jpg" }
+];
+
+const STORY_GRID = [
+  { dept:"hsse", title:"Working at Height: refresh your harness inspection checklist", time:"2 days ago", photo:"Cologne Germany Safety-helmet-with-headset-01.jpg" },
+  { dept:"it", title:"Outlook tips: schedule send and Focused Inbox explained", time:"3 days ago", photo:"Laptop computer.jpg" },
+  { dept:"hr", title:"Open enrollment for training programs closes Friday", time:"4 days ago", photo:"Laptop computer.jpeg" },
+  { dept:"hsse", title:"Heat stress management for offshore & marine crews", time:"1 week ago", photo:"BalticServers data center.jpg" },
+  { dept:"social", title:"Sports & Recreation Club: badminton sign-ups open", time:"1 week ago", photo:"Laptop.jpg" },
+  { dept:"it", title:"Data backup basics: the 3-2-1 rule explained", time:"1 week ago", photo:"Datacenter.jpg" },
+  { dept:"corp", title:"Petra Energy Q2 operations update across Brownfield sites", time:"2 weeks ago", photo:"Wireless network.jpg" },
+  { dept:"hr", title:"PTPTN & EPF: year-end HR reminders", time:"2 weeks ago", photo:"USB flash drive.JPG" }
+];
+
+const QUICK_LINKS = [
+  { label:"SAP Portal", icon:"grid", href:"#" },
+  { label:"M365", icon:"cloud", href:"#" },
+  { label:"i-Petra / MIHCM", icon:"chat", href:"#" },
+  { label:"IT Helpdesk", icon:"ticket", href:"#" }
+];
+
+const SITES = [
+  { name:"Labuan", lat:5.2831, lon:115.2308 },
+  { name:"Bintulu", lat:3.1667, lon:113.0333 }
+];
+
+const ICONS = {
+  grid: `<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>`,
+  cloud: `<path d="M7 18a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 18H7z"/>`,
+  chat: `<path d="M4 4h16a1 1 0 011 1v10a1 1 0 01-1 1H9l-4 4v-4H4a1 1 0 01-1-1V5a1 1 0 011-1z"/>`,
+  ticket: `<path d="M3 9a2 2 0 002-2V6a1 1 0 011-1h12a1 1 0 011 1v1a2 2 0 002 2v6a2 2 0 00-2 2v1a1 1 0 01-1 1H6a1 1 0 01-1-1v-1a2 2 0 00-2-2z"/><path d="M13 5v14" stroke-dasharray="2 2"/>`,
+  home: `<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>`,
+  shield: `<path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/>`,
+  laptop: `<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M2 19h20"/>`,
+  people: `<circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14c2.7.2 4.5 2.2 4.5 6"/>`,
+  heart: `<path d="M12 20s-7-4.4-9.5-8.8C.7 7.8 2.3 4.5 5.6 4c2-.3 3.7.8 4.4 2.4C10.7 4.8 12.4 3.7 14.4 4c3.3.5 4.9 3.8 3.1 7.2C15 15.6 12 20 12 20z"/>`
+};
+function iconSvg(key){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[key]||ICONS.grid}</svg>`;
+}
+const WX_ICONS = {
+  clear: `<circle cx="12" cy="12" r="5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>`,
+  cloud: `<path d="M7 18a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 18H7z"/>`,
+  rain: `<path d="M7 15a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 15H7z"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/>`,
+  storm: `<path d="M7 13a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 13H7z"/><path d="M13 14l-3 5h3l-2 4"/>`
+};
+function wxIconSvg(cond, cls){
+  const c = (cond||'').toLowerCase();
+  let key = 'cloud';
+  if(c.includes('storm')) key = 'storm';
+  else if(c.includes('rain')||c.includes('drizzle')) key = 'rain';
+  else if(c.includes('clear')||c.includes('sun')) key = 'clear';
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${WX_ICONS[key]}</svg>`;
+}
+function commonsUrl(filename){
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename.replace(/ /g,'_'))}?width=900`;
+}
+function badge(deptKey, size){
+  const d = DEPTS[deptKey] || DEPTS.corp;
+  return `<span class="${size==='hero'?'':'b-badge'}">
+    <span class="dept-dot" style="width:7px;height:7px;background:${d.color};display:inline-block;border-radius:50%;"></span>
+    <span class="${size==='grid' ? 'g-badge-text' : 'b-badge-text'}">${d.label}</span>
+  </span>`;
+}
+
+function renderTabs(){
+  document.getElementById('tabs').innerHTML = TABS.map((t,i) => `
+    <div class="tab ${i===0?'active':''}">${iconSvg(t.icon)}<span>${t.label}</span></div>
+  `).join('');
+}
+function renderMarquee(){
+  const items = TRENDING.map((t,i) => `<div class="marquee-item"><b>#${i+1}</b> ${t}</div>`).join('');
+  document.getElementById('marqueeTrack').innerHTML = items + items;
+}
+
+let heroIndex = 0;
+function renderHero(){
+  const s = HERO_STORIES[heroIndex];
+  const d = DEPTS[s.dept] || DEPTS.corp;
+  document.getElementById('heroDot').style.background = d.color;
+  document.getElementById('heroTag').textContent = d.label;
+  document.getElementById('heroTime').textContent = s.time;
+  document.getElementById('heroTitle').textContent = s.title;
+  document.getElementById('heroDesc').textContent = s.desc;
+  const img = document.getElementById('heroPhoto');
+  img.onerror = () => { img.style.display = 'none'; };
+  img.style.display = '';
+  img.src = commonsUrl(s.photo);
+  const dotsWrap = document.getElementById('heroDots');
+  dotsWrap.innerHTML = '';
+  HERO_STORIES.forEach((_, i) => {
+    const dd = document.createElement('div');
+    dd.className = 'hero-dot' + (i === heroIndex ? ' active' : '');
+    dd.addEventListener('click', () => { heroIndex = i; renderHero(); resetHeroTimer(); });
+    dotsWrap.appendChild(dd);
+  });
+}
+document.getElementById('heroPrev').addEventListener('click', () => {
+  heroIndex = (heroIndex - 1 + HERO_STORIES.length) % HERO_STORIES.length;
+  renderHero(); resetHeroTimer();
+});
+document.getElementById('heroNext').addEventListener('click', () => {
+  heroIndex = (heroIndex + 1) % HERO_STORIES.length;
+  renderHero(); resetHeroTimer();
+});
+let heroTimer = null;
+function resetHeroTimer(){
+  clearTimeout(heroTimer);
+  heroTimer = setTimeout(() => {
+    heroIndex = (heroIndex + 1) % HERO_STORIES.length;
+    renderHero();
+    resetHeroTimer();
+  }, 8000);
+}
+
+function renderBento(){
+  document.getElementById('bento').innerHTML = BENTO.map(s => `
+    <div class="b-card ${s.wide?'wide':''}">
+      <img src="${commonsUrl(s.photo)}" onerror="this.style.display='none'" alt="">
+      <div class="b-body">
+        ${badge(s.dept,'bento')}
+        <p class="b-title">${s.title}</p>
+        <div class="b-time">${s.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function renderTrending(){
+  document.getElementById('trendBody').innerHTML = TRENDING.map((t,i) => `
+    <div class="tr-row">
+      <span class="tr-num">${i+1}</span>
+      <div class="tr-body"><p class="tr-title">${t}</p></div>
+    </div>
+  `).join('');
+}
+function renderGrid(){
+  document.getElementById('storyGrid').innerHTML = STORY_GRID.map(s => `
+    <div class="g-card">
+      <img src="${commonsUrl(s.photo)}" onerror="this.style.display='none'" alt="">
+      <div class="g-card-body">
+        ${badge(s.dept,'grid')}
+        <p class="g-title">${s.title}</p>
+        <div class="g-meta">${s.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function renderQuickLinks(){
+  document.getElementById('qlGrid').innerHTML = QUICK_LINKS.map(q => `
+    <a class="ql-item" href="${q.href}">
+      <div class="ql-icon">${iconSvg(q.icon)}</div>
+      <div class="ql-label">${q.label}</div>
+    </a>
+  `).join('');
+}
+
+function weatherCondition(code){
+  if(code === 0) return 'Clear';
+  if([1,2,3].includes(code)) return 'Cloudy';
+  if([45,48].includes(code)) return 'Fog';
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return 'Rain';
+  if([95,96,99].includes(code)) return 'Thunderstorm';
+  if([71,73,75,77,85,86].includes(code)) return 'Snow';
+  return 'Cloudy';
+}
+async function loadWeather(){
+  const wxBody = document.getElementById('wxBody');
+  try{
+    const results = await Promise.all(SITES.map(async site => {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${site.lat}&longitude=${site.lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,weather_code&timezone=auto&forecast_days=4`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const days = data.daily.time.slice(1,4).map((d,i) => ({
+        label: new Date(d).toLocaleDateString('en-MY',{weekday:'short'}),
+        temp: Math.round(data.daily.temperature_2m_max[i+1]),
+        cond: weatherCondition(data.daily.weather_code[i+1])
+      }));
+      return {
+        name: site.name,
+        temp: Math.round(data.current.temperature_2m),
+        cond: weatherCondition(data.current.weather_code),
+        days
+      };
+    }));
+    wxBody.innerHTML = results.map((r, idx) => `
+      ${idx>0 ? '<div class="wx-divider"></div>' : ''}
+      <div class="wx-site-label">${r.name}</div>
+      <div class="wx-now">
+        <div class="wx-now-left">
+          ${wxIconSvg(r.cond,'wx-icon-lg')}
+          <div><div class="wx-city">${r.cond}</div><div class="wx-cond">Now</div></div>
+        </div>
+        <div class="wx-temp-lg">${r.temp}&deg;</div>
+      </div>
+      <div class="wx-strip">
+        ${r.days.map(d => `
+          <div class="wx-strip-day">
+            <span>${d.label}</span>
+            ${wxIconSvg(d.cond,'')}
+            <b>${d.temp}&deg;</b>
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }catch(e){
+    wxBody.innerHTML = `<div class="wx-now"><span class="wx-city">Weather unavailable</span></div>`;
+  }
+}
+
+const STOCK_FALLBACK = { price: 0.70, prevClose: 0.695 };
+function drawSparkline(closes){
+  const svg = document.getElementById('stockSpark');
+  if(!closes || closes.length < 2){ svg.innerHTML=''; return; }
+  const w = 90, h = 34, pad = 3;
+  const min = Math.min(...closes), max = Math.max(...closes);
+  const range = (max - min) || 1;
+  const pts = closes.map((c,i) => {
+    const x = pad + (i/(closes.length-1)) * (w - pad*2);
+    const y = h - pad - ((c-min)/range) * (h - pad*2);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+  const up = closes[closes.length-1] >= closes[0];
+  svg.innerHTML = `<polyline points="${pts.join(' ')}" fill="none" stroke="${up?'#1E7A4C':'#B41F2E'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+async function loadStock(){
+  const priceEl = document.getElementById('stockPrice');
+  const chgEl = document.getElementById('stockChg');
+  const noteEl = document.getElementById('stockNote');
+  try{
+    const res = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/5133.KL?range=1mo&interval=1d');
+    if(!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    const result = data.chart.result[0];
+    const meta = result.meta;
+    const price = meta.regularMarketPrice;
+    const prevClose = meta.previousClose || meta.chartPreviousClose;
+    const closes = (result.indicators.quote[0].close || []).filter(v => v != null);
+    renderStock(price, prevClose, 'Live \u2014 Yahoo Finance');
+    drawSparkline(closes.length ? closes : [prevClose, price]);
+  }catch(e){
+    renderStock(STOCK_FALLBACK.price, STOCK_FALLBACK.prevClose, 'Last known snapshot \u2014 live feed unavailable on this network');
+    drawSparkline([0.68,0.685,0.69,0.688,0.695,0.70]);
+  }
+  function renderStock(price, prevClose, note){
+    const chg = price - prevClose;
+    const pct = (chg/prevClose*100);
+    const up = chg >= 0;
+    priceEl.textContent = `RM ${price.toFixed(3)}`;
+    chgEl.textContent = `${up?'+':''}${chg.toFixed(3)} (${up?'+':''}${pct.toFixed(2)}%)`;
+    chgEl.className = 'stock-chg ' + (up ? 'up' : 'down');
+    noteEl.textContent = note;
+  }
+}
+
+function updateGreeting(){
+  const now = new Date();
+  const hour = now.getHours();
+  const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+  document.getElementById('greetText').innerHTML = `Good ${part}, <b>Muhammad Akmalarif</b> &mdash; here's what's happening across ONE-PETRA today.`;
+  document.getElementById('greetDate').textContent = now.toLocaleString('en-MY', {
+    weekday:'long', day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'
+  });
+}
+
+// Bursa Malaysia main board trading hours: 9:00-12:30 and 14:30-17:00 MYT, Mon-Fri
+function updateMarketStatus(){
+  const el = document.getElementById('mktStatus');
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone:'Asia/Kuala_Lumpur' }));
+  const day = now.getDay();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const isWeekday = day >= 1 && day <= 5;
+  const inSession = isWeekday && ((mins >= 540 && mins <= 750) || (mins >= 870 && mins <= 1020));
+  el.className = 'mkt-status ' + (inSession ? 'open' : 'closed');
+  el.innerHTML = `<span class="mkt-dot"></span><span>${inSession ? 'Market Open' : 'Market Closed'}</span>`;
+}
+
+/* ===========================================================
+   DAYS WITHOUT LTI — counts up live from a fixed reference date
+   so the number is always accurate, not hardcoded.
+=========================================================== */
+const LTI_START = new Date('2025-04-10T00:00:00+08:00');
+function updateLTI(){
+  const now = new Date();
+  const days = Math.max(0, Math.floor((now - LTI_START) / 86400000));
+  const el = document.getElementById('ltiNumber');
+  const target = days;
+  let current = 0;
+  const step = Math.max(1, Math.round(target / 40));
+  clearInterval(el._timer);
+  el._timer = setInterval(() => {
+    current = Math.min(target, current + step);
+    el.textContent = current.toLocaleString('en-MY');
+    if(current >= target) clearInterval(el._timer);
+  }, 20);
+  document.getElementById('ltiSince').textContent = `Since ${LTI_START.toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric'})}`;
+}
+
+/* ===========================================================
+   INTERACTIVE POLL — click to vote, animated result bars.
+   In-memory only (resets on page reload); no account/tracking.
+=========================================================== */
+let pollVoted = false;
+function renderPoll(){
+  const wrap = document.getElementById('pollOptions');
+  const total = POLL.options.reduce((s,o) => s + o.votes, 0);
+  wrap.innerHTML = POLL.options.map((o,i) => {
+    const pct = total ? Math.round(o.votes/total*100) : 0;
+    return `
+      <div class="poll-opt ${pollVoted?'voted':''}" data-i="${i}">
+        ${pollVoted ? `<span class="fill-bar" style="width:${pct}%"></span>` : ''}
+        <span class="opt-content">
+          <span>${o.label}</span>
+          <span class="opt-pct">${pct}%</span>
+        </span>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('pollMeta').textContent = pollVoted
+    ? `${total.toLocaleString('en-MY')} votes so far \u2014 thanks for voting!`
+    : 'Tap an option to vote';
+  if(!pollVoted){
+    wrap.querySelectorAll('.poll-opt').forEach(el => {
+      el.addEventListener('click', () => {
+        const i = parseInt(el.dataset.i, 10);
+        POLL.options[i].votes += 1;
+        pollVoted = true;
+        renderPoll();
+      });
+    });
+  }
+}
+
+function renderEvents(){
+  document.getElementById('eventsStrip').innerHTML = EVENTS.map(e => `
+    <div class="event-item">
+      <div class="event-date"><span class="d">${e.day}</span><span class="m">${e.mon}</span></div>
+      <div>
+        <div class="event-title">${e.title}</div>
+        <div class="event-sub">${e.sub}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('fyear').textContent = new Date().getFullYear();
+renderTabs();
+renderMarquee();
+renderHero();
+resetHeroTimer();
+renderBento();
+renderTrending();
+renderGrid();
+renderQuickLinks();
+renderPoll();
+renderEvents();
+updateLTI();
+loadWeather();
+loadStock();
+updateGreeting();
+updateMarketStatus();
+setInterval(loadWeather, 15 * 60 * 1000);
+setInterval(loadStock, 5 * 60 * 1000);
+setInterval(updateGreeting, 60 * 1000);
+setInterval(updateMarketStatus, 60 * 1000);
+</script>
+
+</body>
+</html>
