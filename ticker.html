@@ -9,6 +9,7 @@
 <style>
   :root{
     --petra-red: #B41F2E;
+    --petra-red-dark: #841720;
     --navy: #0C1B26;
     --navy-2: #142B3B;
   }
@@ -19,13 +20,13 @@
   .ticker-wrap{
     position:relative; overflow:hidden;
     display:flex; align-items:stretch;
-    background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 100%);
+    background: linear-gradient(120deg, var(--petra-red) 0%, var(--petra-red-dark) 100%);
     border-radius:5px;
-    box-shadow:0 2px 8px rgba(12,27,38,0.18);
+    box-shadow:0 2px 8px rgba(132,23,32,0.28);
   }
   .ticker-badge{
     flex-shrink:0; display:flex; align-items:center; gap:7px;
-    background:var(--petra-red); color:#fff;
+    background:var(--navy); color:#fff;
     font-family:'IBM Plex Mono'; font-size:11px; font-weight:700;
     letter-spacing:0.06em; text-transform:uppercase;
     padding:0 16px; white-space:nowrap; z-index:2;
@@ -48,15 +49,15 @@
   .ticker-item{
     display:flex; align-items:center; gap:10px; flex-shrink:0;
     padding:11px 28px; white-space:nowrap;
-    color:#D7DEE3; font-size:13px; text-decoration:none;
+    color:#fff; font-size:13px; text-decoration:none;
   }
-  .ticker-item:hover{color:#fff;}
+  .ticker-item:hover{color:#FBE7E9;}
   .ticker-item .tag{
     font-family:'IBM Plex Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.05em;
-    text-transform:uppercase; color:#fff; background:rgba(255,255,255,0.14);
+    text-transform:uppercase; color:#fff; background:rgba(255,255,255,0.20);
     padding:2px 8px; border-radius:10px; flex-shrink:0;
   }
-  .ticker-sep{width:1px; height:14px; background:rgba(255,255,255,0.18); flex-shrink:0;}
+  .ticker-sep{width:1px; height:14px; background:rgba(255,255,255,0.25); flex-shrink:0;}
 
   @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; } }
   @media (max-width:560px){
