@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE-PETRA Ticker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --petra-red: #B41F2E;
+    --navy: #0C1B26;
+    --navy-2: #142B3B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:transparent;}
+  body{font-family:'IBM Plex Sans', system-ui, sans-serif;}
+
+  .ticker-wrap{
+    position:relative; overflow:hidden;
+    display:flex; align-items:stretch;
+    background: linear-gradient(120deg, var(--navy) 0%, var(--navy-2) 100%);
+    border-radius:5px;
+    box-shadow:0 2px 8px rgba(12,27,38,0.18);
+  }
+  .ticker-badge{
+    flex-shrink:0; display:flex; align-items:center; gap:7px;
+    background:var(--petra-red); color:#fff;
+    font-family:'IBM Plex Mono'; font-size:11px; font-weight:700;
+    letter-spacing:0.06em; text-transform:uppercase;
+    padding:0 16px; white-space:nowrap; z-index:2;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+    padding-right:24px;
+  }
+  .live-dot{width:6px;height:6px;border-radius:50%; background:#fff; animation:pulseDot 1.6s ease-in-out infinite; flex-shrink:0;}
+  @keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+  .ticker-viewport{flex:1; overflow:hidden; position:relative;}
+  .ticker-track{
+    display:flex; align-items:center; gap:0; height:100%;
+    animation: scrollLeft var(--dur, 38s) linear infinite;
+    will-change: transform;
+  }
+  .ticker-wrap:hover .ticker-track,
+  .ticker-wrap:focus-within .ticker-track{ animation-play-state: paused; }
+  @keyframes scrollLeft{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+
+  .ticker-item{
+    display:flex; align-items:center; gap:10px; flex-shrink:0;
+    padding:11px 28px; white-space:nowrap;
+    color:#D7DEE3; font-size:13px; text-decoration:none;
+  }
+  .ticker-item:hover{color:#fff;}
+  .ticker-item .tag{
+    font-family:'IBM Plex Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.05em;
+    text-transform:uppercase; color:#fff; background:rgba(255,255,255,0.14);
+    padding:2px 8px; border-radius:10px; flex-shrink:0;
+  }
+  .ticker-sep{width:1px; height:14px; background:rgba(255,255,255,0.18); flex-shrink:0;}
+
+  @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; } }
+  @media (max-width:560px){
+    .ticker-badge{padding:0 12px 20px 12px; font-size:10px;}
+    .ticker-item{padding:10px 18px; font-size:12px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap" id="tickerWrap">
+  <span class="ticker-badge"><span class="live-dot"></span>Latest</span>
+  <div class="ticker-viewport">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+</div>
+
+<script>
+/* ===========================================================
+   EDITABLE CONTENT
+   Add, remove, or re-order items freely. "tag" is the small
+   pill label; "text" is the headline; "href" is optional.
+=========================================================== */
+const ITEMS = [
+  { tag:"HSE Alert", text:"Level 4 Menara OBYU renovation update & safety reminders \u2014 follow STOP WORK policy for unsafe acts/conditions", href:"#" },
+  { tag:"Generative Culture", text:"Empowering Employees Through UCUA & S.A.F.E. System Awareness \u2014 \u201cI Empower Through Capability\u201d", href:"#" },
+  { tag:"Operations", text:"Offtake tanker Sloman Thetis came alongside Duta Pacific on 1 July 2026, third attempt", href:"#" },
+  { tag:"Events", text:"Leadership Team dinner with Leaders in Miri \u2014 Sun, 19 Jul, 6:00 PM", href:"#" },
+  { tag:"Events", text:"AKW Goes Live event at AKW Site \u2014 Mon, 20 Jul, all day", href:"#" },
+  { tag:"Events", text:"Baram Regatta 2026 \u2014 23\u201326 Jul", href:"#" },
+  { tag:"Industry", text:"Malaysian Oil, Gas & Energy Services Council (MOGSC) 2026 \u2014 11 Aug", href:"#" },
+  { tag:"Stock", text:"PENERGY (5133.KL) RM 0.745, +0.025 (+3.47%) as of 16 Jul 2026, 4:43pm", href:"#" }
+];
+
+const DURATION_SECONDS = 40; // lower = faster scroll
+
+function render(){
+  const track = document.getElementById('tickerTrack');
+  const html = ITEMS.map(i => `
+    <a class="ticker-item" href="${i.href || '#'}">
+      <span class="tag">${i.tag}</span>
+      <span>${i.text}</span>
+    </a>
+    <span class="ticker-sep"></span>
+  `).join('');
+  // duplicate content so the loop is seamless
+  track.innerHTML = html + html;
+  track.style.setProperty('--dur', DURATION_SECONDS + 's');
+}
+render();
+</script>
+
+</body>
+</html>
