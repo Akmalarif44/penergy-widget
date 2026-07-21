@@ -30,7 +30,7 @@
 
   .tile{
     position:relative; display:block; overflow:hidden; border-radius:10px;
-    min-height:190px; background:var(--ink);
+    aspect-ratio:1 / 1; background:var(--ink);
     box-shadow:0 2px 8px rgba(12,27,38,0.10);
     transition:transform .15s, box-shadow .15s;
   }
@@ -45,7 +45,7 @@
     position:absolute; inset:0;
     background:linear-gradient(0deg, rgba(6,14,20,0.90) 0%, rgba(6,14,20,0.35) 55%, rgba(6,14,20,0.10) 100%);
   }
-  .tile-body{position:relative; z-index:1; height:100%; min-height:190px; display:flex; flex-direction:column; justify-content:flex-end; padding:14px;}
+  .tile-body{position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; justify-content:flex-end; padding:14px;}
   .tile-icon{
     width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.16);
     border:1px solid rgba(255,255,255,0.3);
