@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIT News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink: #1B1F23;
+    --steel: #5A6B78;
+    --line: #E2DAC8;
+    --cream: #F4F0E6;
+    --c-hsse: #B41F2E;
+    --c-it: #1F5FA8;
+    --c-hr: #7A3FA0;
+    --c-social: #D98E2B;
+    --c-corp: #1E7A4C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:transparent;}
+  body{font-family:'IBM Plex Sans', system-ui, sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased;}
+  a{color:inherit; text-decoration:none;}
+
+  .wrap{max-width:1000px; margin:0 auto;}
+  .section-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
+  .section-head h2{font-family:'IBM Plex Mono'; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin:0; color:var(--ink);}
+  .section-line{flex:1; height:1px; background:var(--line);}
+
+  .grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr 1fr;} }
+  @media (max-width:520px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden;
+    display:flex; flex-direction:column; transition:box-shadow .15s, transform .15s;
+  }
+  .card:hover{box-shadow:0 4px 14px rgba(12,27,38,0.10); transform:translateY(-1px);}
+  .card img{width:100%; height:130px; object-fit:cover; display:block; background:var(--cream);}
+  .card-body{padding:12px 14px 14px;}
+  .card-badge{display:flex; align-items:center; gap:6px; margin-bottom:8px;}
+  .dept-dot{width:7px; height:7px; border-radius:50%; flex-shrink:0;}
+  .dept-label{
+    font-family:'IBM Plex Mono'; font-size:10px; font-weight:700; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--steel);
+  }
+  .card-title{font-size:13.5px; font-weight:700; line-height:1.4; margin:0 0 8px; color:var(--ink);}
+  .card-time{font-size:11px; color:var(--steel);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="section-head"><h2>GIT News</h2><div class="section-line"></div></div>
+  <div class="grid" id="newsGrid"></div>
+</div>
+
+<script>
+/* ===========================================================
+   EDITABLE CONTENT — add/edit/remove news items freely.
+   dept must match a key in DEPTS below (controls the colored dot + label).
+   photo: a Wikimedia Commons filename (see commonsUrl()) OR any
+   direct https image URL you already have (e.g. your own uploaded photo).
+=========================================================== */
+const DEPTS = {
+  it:    { label: "Group IT",           color: "var(--c-it)" },
+  hsse:  { label: "HSSE Workspace",     color: "var(--c-hsse)" },
+  hr:    { label: "HR",                 color: "var(--c-hr)" },
+  social:{ label: "Social & Community", color: "var(--c-social)" },
+  corp:  { label: "Corporate Comms",    color: "var(--c-corp)" }
+};
+
+const NEWS_POOL = [
+  { dept:"it", title:"USB drives found on-site? Hand them to IT, don't plug in", photo:"USB Stick.jpg" },
+  { dept:"it", title:"Outlook tips: schedule send and Focused Inbox explained", photo:"Laptop computer.jpg" },
+  { dept:"it", title:"Data backup basics: the 3-2-1 rule explained", photo:"Datacenter.jpg" },
+  { dept:"it", title:"Strong passwords & MFA: 60 seconds that stop most attacks", photo:"Closed lock on laptop (49918711713).jpg" },
+  { dept:"it", title:"Spotting phishing emails: what to check before you click", photo:"Laptop computer monitor (Unsplash).jpg" },
+  { dept:"it", title:"SharePoint vs OneDrive: which one should you actually use?", photo:"Laptop computer.jpeg" },
+  { dept:"hsse", title:"Working at Height: refresh your harness inspection checklist", photo:"Laptop.jpg" },
+  { dept:"hsse", title:"Heat stress management for offshore & marine crews", photo:"BalticServers data center.jpg" },
+  { dept:"hr", title:"Know Your Colleague: meet the new Commissioning Team", photo:"Work Meeting.jpg" },
+  { dept:"social", title:"Sports & Recreation Club: badminton sign-ups open", photo:"Wireless network.jpg" }
+];
+const CARDS_PER_DAY = 4;
+
+function commonsUrl(filename){
+  // If it's already a full URL (your own uploaded photo), just use it as-is.
+  if(/^https?:\/\//i.test(filename)) return filename;
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename.replace(/ /g,'_'))}?width=600`;
+}
+
+/* ---------------------------------------------------------
+   DAILY 8:00 AM ROTATION — same pattern as the IT Digest card.
+   Before 8 AM, the "effective day" is still yesterday, so a
+   fresh set of cards appears right at 8 AM, not midnight.
+--------------------------------------------------------- */
+function effectiveDate(){
+  const now = new Date();
+  const eff = new Date(now);
+  if(now.getHours() < 8) eff.setDate(eff.getDate() - 1);
+  eff.setHours(8,0,0,0);
+  return eff;
+}
+function dayOfYear(d){
+  const start = new Date(d.getFullYear(), 0, 0);
+  return Math.floor((d - start) / 86400000);
+}
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seed){
+  const rand = mulberry32(seed);
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function timeAgo(date){
+  const mins = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
+  if(mins < 60) return mins <= 1 ? 'Just now' : mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if(hrs < 24) return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function todaysNews(){
+  const today = dayOfYear(effectiveDate());
+  const shuffled = seededShuffle(NEWS_POOL.map((_, i) => i), today);
+  const picked = shuffled.slice(0, CARDS_PER_DAY).map(i => NEWS_POOL[i]);
+  const base = effectiveDate(); // today's 8:00 AM
+  return picked.map((item, i) => ({
+    ...item,
+    postedAt: new Date(base.getTime() + i * 3 * 60 * 60 * 1000) // staggered through the day
+  }));
+}
+
+function render(){
+  const grid = document.getElementById('newsGrid');
+  const items = todaysNews();
+  grid.innerHTML = items.map(item => {
+    const d = DEPTS[item.dept] || DEPTS.corp;
+    return `
+      <a class="card" href="#">
+        <img src="${commonsUrl(item.photo)}" alt="" onerror="this.style.display='none'">
+        <div class="card-body">
+          <div class="card-badge">
+            <span class="dept-dot" style="background:${d.color}"></span>
+            <span class="dept-label">${d.label}</span>
+          </div>
+          <p class="card-title">${item.title}</p>
+          <div class="card-time">${timeAgo(item.postedAt)}</div>
+        </div>
+      </a>
+    `;
+  }).join('');
+}
+render();
+
+// Refresh the relative "Xh ago" labels periodically, and pick a fresh
+// set of cards automatically at the next 8:00 AM if the page stays open.
+setInterval(render, 5 * 60 * 1000);
+function scheduleEightAmRefresh(){
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 5);
+  if(next <= now) next.setDate(next.getDate() + 1);
+  setTimeout(() => { render(); scheduleEightAmRefresh(); }, next - now);
+}
+scheduleEightAmRefresh();
+</script>
+
+</body>
+</html>
