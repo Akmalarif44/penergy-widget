@@ -1,6 +1,3 @@
-
-
-It services · HTML
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,18 +18,18 @@ It services · HTML
   html,body{margin:0;padding:0;background:transparent;}
   body{font-family:'IBM Plex Sans', system-ui, sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased;}
   a{color:inherit; text-decoration:none;}
- 
+
   .wrap{max-width:1000px; margin:0 auto;}
   .section-head{display:flex; align-items:center; gap:10px; margin-bottom:14px;}
   .section-head h2{font-family:'IBM Plex Mono'; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin:0; color:var(--ink);}
   .section-line{flex:1; height:1px; background:var(--line);}
- 
-  .grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; max-width:720px;}
-  @media (max-width:480px){ .grid{grid-template-columns:1fr;} }
- 
+
+  .grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:110px; max-width:1000px;}
+  @media (max-width:700px){ .grid{grid-template-columns:1fr; gap:14px;} }
+
   .tile{
     position:relative; display:block; overflow:hidden; border-radius:10px;
-    aspect-ratio:1 / 1; background:var(--ink);
+    aspect-ratio:16 / 9; background:var(--ink);
     box-shadow:0 2px 8px rgba(12,27,38,0.10);
     transition:transform .15s, box-shadow .15s;
   }
@@ -56,7 +53,7 @@ It services · HTML
   .tile-icon svg{width:18px; height:18px;}
   .tile-label{font-size:15.5px; font-weight:700; color:#fff; line-height:1.3;}
   .tile-sub{font-size:11px; color:rgba(255,255,255,0.75); margin-top:3px;}
- 
+
   @media (prefers-reduced-motion: reduce){
     .tile video{ display:none; }
     .tile{ background:linear-gradient(150deg, #841720, #B41F2E); }
@@ -64,12 +61,12 @@ It services · HTML
 </style>
 </head>
 <body>
- 
+
 <div class="wrap">
   <div class="section-head"><h2>IT Services</h2><div class="section-line"></div></div>
   <div class="grid" id="tileGrid"></div>
 </div>
- 
+
 <script>
 /* ===========================================================
    EDITABLE — add/remove/reorder tiles freely.
@@ -104,7 +101,7 @@ const TILES = [
     video: "https://assets.mixkit.co/videos/22987/22987-360.mp4"
   }
 ];
- 
+
 const ICONS = {
   sap: `<path d="M4 17V7l6 10V7"/><path d="M13 7h4a3 3 0 010 6h-2v4"/>`,
   desktop: `<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>`,
@@ -114,11 +111,11 @@ const ICONS = {
   cloud: `<path d="M7 18a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0118 18H7z"/>`,
   shield: `<path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/>`
 };
- 
+
 function iconSvg(key){
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[key] || ICONS.grid}</svg>`;
 }
- 
+
 function render(){
   document.getElementById('tileGrid').innerHTML = TILES.map(t => `
     <a class="tile" href="${t.href}">
@@ -136,13 +133,6 @@ function render(){
 }
 render();
 </script>
- 
+
 </body>
 </html>
- 
-
-
-
-
-
-
