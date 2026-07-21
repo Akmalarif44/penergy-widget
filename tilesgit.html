@@ -118,7 +118,7 @@ function iconSvg(key){
 
 function render(){
   document.getElementById('tileGrid').innerHTML = TILES.map(t => `
-    <a class="tile" href="${t.href}">
+    <a class="tile" href="${t.href}" target="_blank" rel="noopener">
       <video autoplay muted loop playsinline preload="metadata" onerror="this.style.display='none'">
         <source src="${t.video}" type="video/mp4">
       </video>
