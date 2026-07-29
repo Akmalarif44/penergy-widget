@@ -77,37 +77,63 @@
 
 <script>
 /* ===========================================================
-   EDITABLE CONTENT
-   Add, remove, or re-order items freely. "tag" is the small
-   pill label; "text" is the headline; "href" is optional.
+   LIVE CONTENT MODE
+   Items are now fetched from items.json (same repo/folder as
+   this file, served via GitHub Pages) instead of being
+   hardcoded here. To update the ticker, edit items.json and
+   push to GitHub — no need to touch this file or SharePoint.
 =========================================================== */
-const ITEMS = [
-  { tag:"HSE Alert", text:"Level 4 Menara OBYU renovation update & safety reminders \u2014 follow STOP WORK policy for unsafe acts/conditions", href:"#" },
-  { tag:"Generative Culture", text:"Empowering Employees Through UCUA & S.A.F.E. System Awareness \u2014 \u201cI Empower Through Capability\u201d", href:"#" },
-  { tag:"Operations", text:"Offtake tanker Sloman Thetis came alongside Duta Pacific on 1 July 2026, third attempt", href:"#" },
-  { tag:"Events", text:"Leadership Team dinner with Leaders in Miri \u2014 Sun, 19 Jul, 6:00 PM", href:"#" },
-  { tag:"Events", text:"AKW Goes Live event at AKW Site \u2014 Mon, 20 Jul, all day", href:"#" },
-  { tag:"Events", text:"Baram Regatta 2026 \u2014 23\u201326 Jul", href:"#" },
-  { tag:"Industry", text:"Malaysian Oil, Gas & Energy Services Council (MOGSC) 2026 \u2014 11 Aug", href:"#" },
-  { tag:"Stock", text:"PENERGY (5133.KL) RM 0.745, +0.025 (+3.47%) as of 16 Jul 2026, 4:43pm", href:"#" }
+
+const ITEMS_URL = "items.json"; // relative path — assumes same folder on GitHub Pages
+const DURATION_SECONDS = 20;    // lower = faster scroll
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // re-check items.json every 5 min
+
+// Fallback content shown only if the fetch fails (network issue,
+// GitHub Pages down, CORS block from within the SharePoint iframe, etc.)
+const FALLBACK_ITEMS = [
+  { tag: "Notice", text: "Live feed unavailable — showing cached content.", href: "#" }
 ];
 
-const DURATION_SECONDS = 20; // lower = faster scroll
-
-function render(){
-  const track = document.getElementById('tickerTrack');
-  const html = ITEMS.map(i => `
+function buildTrackHTML(items){
+  return items.map(i => `
     <a class="ticker-item" href="${i.href || '#'}">
-      <span class="tag">${i.tag}</span>
-      <span>${i.text}</span>
+      <span class="tag">${escapeHTML(i.tag)}</span>
+      <span>${escapeHTML(i.text)}</span>
     </a>
     <span class="ticker-sep"></span>
   `).join('');
-  // duplicate content so the loop is seamless
-  track.innerHTML = html + html;
+}
+
+function escapeHTML(str){
+  const div = document.createElement('div');
+  div.textContent = String(str ?? '');
+  return div.innerHTML;
+}
+
+async function fetchItems(){
+  const res = await fetch(ITEMS_URL + '?_=' + Date.now(), { cache: 'no-store' });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if(!Array.isArray(data) || data.length === 0) throw new Error('Empty or invalid items.json');
+  return data;
+}
+
+async function render(){
+  const track = document.getElementById('tickerTrack');
+  let items;
+  try {
+    items = await fetchItems();
+  } catch (err) {
+    console.warn('[ticker] falling back to static content:', err.message);
+    items = FALLBACK_ITEMS;
+  }
+  const html = buildTrackHTML(items);
+  track.innerHTML = html + html; // duplicate so the scroll loop is seamless
   track.style.setProperty('--dur', DURATION_SECONDS + 's');
 }
+
 render();
+setInterval(render, REFRESH_INTERVAL_MS); // auto-refresh without reloading the SharePoint page
 </script>
 
 </body>
