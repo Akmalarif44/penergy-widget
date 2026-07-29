@@ -11,6 +11,7 @@
     --ink-soft:#8a7477;
     --red:#7a1220;
     --red-bright:#9e1b2e;
+    --green:#0f6b3f;
     --line:#e3d7d9;
     --panel:#fbf5f6;
   }
@@ -32,7 +33,7 @@
   }
   .head{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:space-between;
     flex-shrink:0;
   }
@@ -47,6 +48,11 @@
     text-transform:uppercase;
     color:var(--ink);
     margin:0;
+  }
+  .stamp{
+    font-size:10px;
+    color:var(--ink-soft);
+    margin:3px 0 0 13px;
   }
   .dot{
     width:6px; height:6px;
@@ -121,10 +127,12 @@
   .hero-img{
     position:absolute; inset:0;
     background:center/cover no-repeat;
+    /* keeps large source images crisp when the browser downscales */
+    image-rendering:auto;
     transform:scale(1);
     transition:transform 6s ease;
   }
-  .hero-slide.active .hero-img{ transform:scale(1.08); }
+  .hero-slide.active .hero-img{ transform:scale(1.06); }
   .hero-slide::before{
     content:'';
     position:absolute; inset:0;
@@ -144,7 +152,7 @@
     border-radius:5px;
     z-index:1;
   }
-  .hero-tag.local{ background:#0f6b3f; }
+  .hero-tag.local{ background:var(--green); }
   .hero-body{
     position:absolute; left:0; right:0; bottom:0;
     padding:10px 12px;
@@ -220,6 +228,7 @@
     background:#fdeef0;
   }
   .card-img{
+    position:relative;
     height:64px;
     background:var(--red) center/cover no-repeat;
     display:grid;
@@ -227,6 +236,19 @@
     flex-shrink:0;
   }
   .card-img svg{ width:18px; height:18px; opacity:0.9; }
+  .card-flag{
+    position:absolute;
+    top:5px; left:5px;
+    background:var(--green);
+    color:#fff;
+    font-family:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;
+    font-size:8px;
+    font-weight:700;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    padding:2px 5px;
+    border-radius:4px;
+  }
   .card-body{ padding:7px 9px 8px; }
   .card-title{
     font-size:11px;
@@ -288,7 +310,10 @@
 
 <div class="panel">
   <div class="head">
-    <p class="label"><span class="dot"></span>Oil &amp; Gas News — Live Feed</p>
+    <div>
+      <p class="label"><span class="dot"></span>Oil &amp; Gas News — Daily Edition</p>
+      <p class="stamp" id="stamp">Loading…</p>
+    </div>
     <div class="head-right">
       <a class="mogsc-link" href="https://mogsc.org/" target="_blank" rel="noopener" title="Malaysian Oil, Gas &amp; Energy Services Council">MOGSC</a>
       <button class="refresh" id="refreshBtn" title="Refresh now" aria-label="Refresh now">
@@ -315,43 +340,109 @@
 
      NOTE ON MOGSC: mogsc.org has NO RSS feed. Its "Latest News"
      block is a hand-maintained Slider Revolution carousel that
-     links out to The Edge / Upstream, and it goes stale for
-     months at a time. It cannot be automated. Instead we pull
-     the same trade sources MOGSC itself curates from, and keep
-     a permanent MOGSC link in the header.
+     links out to The Edge / Upstream and goes stale for months
+     at a time, so it cannot be automated. We pull the same trade
+     sources MOGSC itself curates from, and keep a permanent
+     MOGSC link in the header.
 
      Feeds that 404 or block the proxy are skipped silently, so
      it is safe to add/remove entries here. Comment one out if
      Corp Comm objects to a particular masthead.
   =========================================================== */
   var FEEDS = [
-    { name: 'OilPrice',        url: 'https://oilprice.com/rss/main' },
-    { name: 'Offshore Energy', url: 'https://www.offshore-energy.biz/feed/' },
-    { name: 'Energy Voice',    url: 'https://www.energyvoice.com/feed/' },
-    { name: 'World Oil',       url: 'https://worldoil.com/rss?feed=news' },
+    { name: 'OilPrice',          url: 'https://oilprice.com/rss/main' },
+    { name: 'Offshore Energy',   url: 'https://www.offshore-energy.biz/feed/' },
+    { name: 'Energy Voice',      url: 'https://www.energyvoice.com/feed/' },
+    { name: 'World Oil',         url: 'https://worldoil.com/rss?feed=news' },
     { name: 'Oil & Gas Journal', url: 'https://www.ogj.com/__rss/website-scheduled-content.xml' },
-    { name: 'NST Business',    url: 'https://www.nst.com.my/business/rss' }
+    { name: 'NST Business',      url: 'https://www.nst.com.my/business/rss' }
   ];
 
-  /* Stories matching these get promoted into the hero slots so the
-     panel leads with something relevant to us, not US shale prices. */
-  var LOCAL_RE = new RegExp([
-    'malaysia','malaysian','petronas','petroliam','sarawak','sabah','labuan',
-    'bintulu','kerteh','kuala lumpur','mogsc','ogse','peninsular',
-    'asean','south china sea','indonesia','vietnam','thailand','brunei',
-    'sapura','dialog group','yinson','velesto','bumi armada','mmhe',
-    'petra energy','hibiscus','carigali','pttep','wasco','deleum'
-  ].join('|'), 'i');
+  /* ---------- regional relevance scoring ----------
+     Weighted, not just a yes/no match. Highest-scoring stories
+     take the hero slots; everything else drops into the grid.  */
+  var TIER_A = [   // Malaysia + our own backyard — weight 5
+    'malaysia','malaysian','petronas','petroliam nasional','carigali',
+    'sarawak','sabah','labuan','bintulu','kerteh','miri','terengganu',
+    'kimanis','mogsc','ogse','petros','petra energy','penergy'
+  ];
+  var TIER_B = [   // Malaysian-listed OGSE names — weight 4
+    'sapura energy','sapuraomv','dialog group','yinson','velesto',
+    'bumi armada','mmhe','malaysia marine and heavy','hibiscus',
+    'wasco','deleum','uzma','dayang','coastal contracts','perdana petroleum',
+    'icon offshore','t7 global','keyfield','malaysian bulk'
+  ];
+  var TIER_C = [   // wider ASEAN / regional context — weight 2
+    'asean','south china sea','indonesia','pertamina','vietnam','petrovietnam',
+    'thailand','pttep','brunei','philippines','singapore','myanmar','timor'
+  ];
 
-  var PROXY = 'https://api.rss2json.com/v1/api.json?rss_url=';
+  function reFor(list){ return new RegExp('\\b(' + list.join('|') + ')', 'i'); }
+  var RE_A = reFor(TIER_A), RE_B = reFor(TIER_B), RE_C = reFor(TIER_C);
+
+  function scoreOf(item){
+    var hay = (item.title || '') + ' ' + (item.description || '').slice(0, 500);
+    var s = 0;
+    if (RE_A.test(hay)) s += 5;
+    if (RE_B.test(hay)) s += 4;
+    if (RE_C.test(hay)) s += 2;
+    // a hit in the headline itself matters more than one buried in the blurb
+    if (s && (RE_A.test(item.title || '') || RE_B.test(item.title || ''))) s += 3;
+    return s;
+  }
+
+  var PROXY  = 'https://api.rss2json.com/v1/api.json?rss_url=';
+  var CACHE_KEY = 'penergy-og-edition';
+  var ROLLOVER_HOUR = 7;          // new edition publishes at 07:00 local
 
   var scroll = document.getElementById('scroll');
   var refreshBtn = document.getElementById('refreshBtn');
+  var stampEl = document.getElementById('stamp');
   var heroTimer = null;
+  var editionTimer = null;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function proxyUrl(feedUrl){
-    return PROXY + encodeURIComponent(feedUrl) + '&_cb=' + Date.now();
+  /* ---------- daily edition clock ---------- */
+  function editionDate(){
+    var d = new Date();
+    if (d.getHours() < ROLLOVER_HOUR) d.setDate(d.getDate() - 1);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  function editionKey(){
+    var d = editionDate();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+  function editionLabel(){
+    return editionDate().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  }
+  function msUntilRollover(){
+    var next = new Date();
+    next.setHours(ROLLOVER_HOUR, 0, 5, 0);      // +5s cushion past the hour
+    if (next <= new Date()) next.setDate(next.getDate() + 1);
+    return next - new Date();
+  }
+  function scheduleRollover(){
+    clearTimeout(editionTimer);
+    editionTimer = setTimeout(function(){
+      load(true);                  // force-fetch the new day's edition
+      scheduleRollover();
+    }, msUntilRollover());
+  }
+
+  /* ---------- cache ---------- */
+  function readCache(){
+    try{
+      var raw = localStorage.getItem(CACHE_KEY);
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      return (obj && obj.key === editionKey() && obj.items && obj.items.length) ? obj : null;
+    }catch(e){ return null; }
+  }
+  function writeCache(items){
+    try{
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ key: editionKey(), items: items }));
+    }catch(e){ /* private mode / quota — no cache, still renders live */ }
   }
 
   function timeAgo(dateStr){
@@ -364,33 +455,108 @@
     return Math.floor(hrs / 24) + 'd ago';
   }
 
-  function extractImage(item){
+  /* ================= HD IMAGE PIPELINE =================
+     RSS feeds hand us whatever size the CMS felt like. Three
+     things fix the soft/pixelated look:
+       1. strip WordPress "-1024x718" style size suffixes to get
+          back to the original upload
+       2. strip / raise resize query params (?w=, ?resize=, ?fit=)
+       3. keep every candidate and try them in order, falling
+          back the moment one 404s
+  ==================================================== */
+  function hdVariants(url){
+    if (!url) return [];
+    var out = [];
+    var clean = url.replace(/^http:\/\//i, 'https://');
+
+    // Photon / Jetpack CDN — just ask for a big one
+    if (/i\d\.wp\.com|\.files\.wordpress\.com/i.test(clean)){
+      out.push(clean.split('?')[0] + '?w=1600&quality=92');
+    }
+    // drop resize/crop query strings entirely
+    var noQuery = clean.split('?')[0];
+    // WordPress thumbnail suffix: image-1024x718.jpg -> image.jpg
+    var noSuffix = noQuery.replace(/-\d{2,4}x\d{2,4}(?=\.(jpe?g|png|webp|avif)$)/i, '');
+    // some CMSes embed /w_640/ or /resize/640x/ path segments
+    var noPathSize = noSuffix
+      .replace(/\/(w|h)_\d+([,/])/gi, '/')
+      .replace(/\/resize\/\d+x\d*\//gi, '/')
+      .replace(/\/thumbs?\//gi, '/');
+
+    [noPathSize, noSuffix, noQuery, clean].forEach(function(u){
+      if (u && out.indexOf(u) === -1) out.push(u);
+    });
+    return out;
+  }
+
+  function widthHint(url){
+    var m = url.match(/(\d{3,4})x(\d{3,4})/) || url.match(/[?&]w=(\d{3,4})/);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  function imageCandidates(item){
     var html = item.content || item.description || '';
-    var matches = html.match(/<img[^>]+src=["']([^"']+)["']/gi) || [];
-    var skipPattern = /(icon|logo|avatar|pixel|1x1|spacer|tracking)/i;
-    for (var i = 0; i < matches.length; i++){
-      var srcMatch = matches[i].match(/src=["']([^"']+)["']/i);
-      if (!srcMatch) continue;
-      var src = srcMatch[1];
-      if (!skipPattern.test(src)) return src;
+    var skip = /(icon|logo|avatar|pixel|1x1|spacer|tracking|gravatar|feedburner)/i;
+    var raw = [];
+
+    // every <img> in the body, biggest-looking first
+    var tags = html.match(/<img[^>]+>/gi) || [];
+    tags.forEach(function(tag){
+      // srcset gives us the full ladder — take its largest entry
+      var ss = tag.match(/srcset=["']([^"']+)["']/i);
+      if (ss){
+        ss[1].split(',').forEach(function(part){
+          var u = part.trim().split(/\s+/)[0];
+          if (u && !skip.test(u)) raw.push(u);
+        });
+      }
+      var src = tag.match(/src=["']([^"']+)["']/i);
+      if (src && !skip.test(src[1])) raw.push(src[1]);
+    });
+
+    // feed-level image fields as backup
+    if (item.enclosure && item.enclosure.link) raw.push(item.enclosure.link);
+    if (item.thumbnail) raw.push(item.thumbnail);
+
+    // last resort: anything we skipped earlier
+    if (!raw.length){
+      tags.forEach(function(tag){
+        var src = tag.match(/src=["']([^"']+)["']/i);
+        if (src) raw.push(src[1]);
+      });
     }
-    if (matches.length){
-      var first = matches[0].match(/src=["']([^"']+)["']/i);
-      if (first) return first[1];
-    }
-    return '';
+
+    raw.sort(function(a, b){ return widthHint(b) - widthHint(a); });
+
+    var out = [];
+    raw.forEach(function(u){
+      hdVariants(u).forEach(function(v){
+        if (out.indexOf(v) === -1) out.push(v);
+      });
+    });
+    return out.slice(0, 8);
   }
 
-  function imageFor(item){
-    // Body image first — usually full-res. The dedicated thumbnail
-    // field is often small and goes soft once stretched by cover.
-    return extractImage(item) || item.thumbnail || (item.enclosure && item.enclosure.link) || '';
+  // walk the candidate list until one actually loads
+  function paintImage(el, candidates){
+    if (!candidates || !candidates.length) return;
+    var i = 0;
+    (function tryNext(){
+      if (i >= candidates.length) return;
+      var url = candidates[i++];
+      var probe = new Image();
+      probe.onload = function(){
+        // reject tiny decoys that slipped through
+        if (probe.naturalWidth < 200 && i < candidates.length) return tryNext();
+        el.style.backgroundImage = 'url("' + url + '")';
+      };
+      probe.onerror = tryNext;
+      probe.referrerPolicy = 'no-referrer';
+      probe.src = url;
+    })();
   }
 
-  function isLocal(item){
-    return LOCAL_RE.test((item.title || '') + ' ' + (item.description || '').slice(0, 400));
-  }
-
+  /* ---------- rendering ---------- */
   function buildHero(items){
     var hero = document.createElement('div');
     hero.className = 'hero';
@@ -404,13 +570,14 @@
 
       var imgEl = document.createElement('div');
       imgEl.className = 'hero-img';
-      var img = imageFor(item);
-      if (img) imgEl.style.backgroundImage = 'url(' + img + ')';
+      paintImage(imgEl, item._imgs);
       slide.appendChild(imgEl);
 
       var tag = document.createElement('span');
-      tag.className = 'hero-tag' + (item._local ? ' local' : '');
-      tag.textContent = item._local ? 'Malaysia / Region' : (item._source || 'Industry');
+      tag.className = 'hero-tag' + (item._score >= 5 ? ' local' : '');
+      tag.textContent = item._score >= 5 ? 'Malaysia / Region'
+                      : item._score > 0   ? 'Regional'
+                      : (item._source || 'Industry');
       slide.appendChild(tag);
 
       var body = document.createElement('div');
@@ -445,7 +612,6 @@
       hero.addEventListener('mouseleave', function(){ startAutoRotate(hero, items.length); });
       startAutoRotate(hero, items.length);
     }
-
     return hero;
   }
 
@@ -476,11 +642,16 @@
 
     var imgWrap = document.createElement('div');
     imgWrap.className = 'card-img';
-    var img = imageFor(item);
-    if (img){
-      imgWrap.style.backgroundImage = 'url(' + img + ')';
+    if (item._imgs && item._imgs.length){
+      paintImage(imgWrap, item._imgs);
     } else {
       imgWrap.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><path d="M4 21V9l5-3v3l5-3v4h6v11" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 21h20" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>';
+    }
+    if (item._score >= 5){
+      var flag = document.createElement('span');
+      flag.className = 'card-flag';
+      flag.textContent = 'MY';
+      imgWrap.appendChild(flag);
     }
 
     var body = document.createElement('div');
@@ -508,8 +679,8 @@
   function render(items){
     scroll.innerHTML = '';
     if (!items.length) return;
-
     clearInterval(heroTimer);
+
     scroll.appendChild(buildHero(items.slice(0, 3)));
 
     var sub = document.createElement('p');
@@ -523,19 +694,32 @@
       grid.appendChild(buildCard(item, i));
     });
     scroll.appendChild(grid);
+
+    var myCount = items.filter(function(i){ return i._score >= 5; }).length;
+    stampEl.textContent = 'Edition ' + editionLabel() +
+      (myCount ? ' · ' + myCount + ' Malaysia stor' + (myCount === 1 ? 'y' : 'ies') : '');
   }
 
   function showStatus(msg){
     clearInterval(heroTimer);
     scroll.innerHTML = '<div class="status">' + msg + '</div>';
+    stampEl.textContent = 'Edition ' + editionLabel();
   }
 
-  function load(){
+  /* ---------- load ---------- */
+  function load(force){
+    // Same edition already built today? Serve it — the panel stays
+    // stable all day and only turns over at 07:00.
+    if (!force){
+      var cached = readCache();
+      if (cached){ render(cached.items); return; }
+    }
+
     refreshBtn.classList.add('spin');
 
     Promise.all(
       FEEDS.map(function(feed){
-        return fetch(proxyUrl(feed.url), { cache: 'no-store' })
+        return fetch(PROXY + encodeURIComponent(feed.url) + '&_cb=' + Date.now(), { cache: 'no-store' })
           .then(function(res){ return res.ok ? res.json() : null; })
           .then(function(data){
             if (!data || data.status !== 'ok' || !Array.isArray(data.items)) return [];
@@ -553,33 +737,65 @@
 
       var seen = {};
       items = items.filter(function(item){
-        if (!item.link || seen[item.link]) return false;
+        if (!item.link || !item.title || seen[item.link]) return false;
         seen[item.link] = true;
         return true;
       });
 
       items.sort(function(a, b){ return new Date(b.pubDate) - new Date(a.pubDate); });
 
-      // Work from a recent window only, then float Malaysia/ASEAN
-      // stories to the front so the hero is regionally relevant
-      // without ever surfacing something months old.
-      var recent = items.slice(0, 24);
-      recent.forEach(function(item){ item._local = isLocal(item); });
+      // Only consider the last 3 days so nothing stale can be
+      // promoted just because it mentions Petronas.
+      var cutoff = Date.now() - 3 * 864e5;
+      var fresh = items.filter(function(i){ return new Date(i.pubDate).getTime() > cutoff; });
+      if (fresh.length < 9) fresh = items.slice(0, 30);
 
-      var local = recent.filter(function(i){ return i._local; });
-      var rest  = recent.filter(function(i){ return !i._local; });
+      var slim = fresh.slice(0, 40).map(function(item){
+        return {
+          title: item.title,
+          link: item.link,
+          pubDate: item.pubDate,
+          _source: item._source,
+          _score: scoreOf(item),
+          _imgs: imageCandidates(item)
+        };
+      });
 
-      render(local.concat(rest).slice(0, 9));
+      // regional relevance first, recency as the tiebreaker
+      slim.sort(function(a, b){
+        if (b._score !== a._score) return b._score - a._score;
+        return new Date(b.pubDate) - new Date(a.pubDate);
+      });
+
+      var top = slim.slice(0, 9);
+      writeCache(top);
+      render(top);
     }).catch(function(){
-      showStatus('Couldn\u2019t load the latest industry news right now \u2014 try the refresh button, or check back later.');
+      var stale = null;
+      try{
+        var raw = localStorage.getItem(CACHE_KEY);
+        stale = raw ? JSON.parse(raw) : null;
+      }catch(e){}
+      if (stale && stale.items && stale.items.length){
+        render(stale.items);       // yesterday's edition beats an error box
+      } else {
+        showStatus('Couldn\u2019t load the latest industry news right now \u2014 try the refresh button, or check back later.');
+      }
     }).finally(function(){
       setTimeout(function(){ refreshBtn.classList.remove('spin'); }, 500);
     });
   }
 
-  refreshBtn.addEventListener('click', load);
-  load();
-  setInterval(load, 20 * 60 * 1000);
+  // manual refresh always forces a live fetch
+  refreshBtn.addEventListener('click', function(){ load(true); });
+
+  // if the tab sat open past 07:00, catch up on focus
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden && !readCache()) load(true);
+  });
+
+  load(false);
+  scheduleRollover();
 })();
 </script>
 </body>
