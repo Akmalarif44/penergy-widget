@@ -21,19 +21,19 @@
     position:relative; overflow:hidden;
     display:flex; align-items:stretch;
     background: linear-gradient(120deg, var(--petra-red) 0%, var(--petra-red-dark) 100%);
-    border-radius:5px;
-    box-shadow:0 2px 8px rgba(132,23,32,0.28);
+    border-radius:6px;
+    box-shadow:0 3px 10px rgba(132,23,32,0.28);
   }
   .ticker-badge{
-    flex-shrink:0; display:flex; align-items:center; gap:7px;
+    flex-shrink:0; display:flex; align-items:center; gap:9px;
     background:var(--navy); color:#fff;
-    font-family:'IBM Plex Mono'; font-size:11px; font-weight:700;
+    font-family:'IBM Plex Mono'; font-size:13px; font-weight:700;
     letter-spacing:0.06em; text-transform:uppercase;
-    padding:0 16px; white-space:nowrap; z-index:2;
+    padding:0 20px; white-space:nowrap; z-index:2;
     clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
-    padding-right:24px;
+    padding-right:30px;
   }
-  .live-dot{width:6px;height:6px;border-radius:50%; background:#fff; animation:pulseDot 1.6s ease-in-out infinite; flex-shrink:0;}
+  .live-dot{width:8px;height:8px;border-radius:50%; background:#fff; animation:pulseDot 1.6s ease-in-out infinite; flex-shrink:0;}
   @keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
 
   .ticker-viewport{flex:1; overflow:hidden; position:relative;}
@@ -47,22 +47,22 @@
   @keyframes scrollLeft{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
 
   .ticker-item{
-    display:flex; align-items:center; gap:10px; flex-shrink:0;
-    padding:11px 28px; white-space:nowrap;
-    color:#fff; font-size:13px; text-decoration:none;
+    display:flex; align-items:center; gap:12px; flex-shrink:0;
+    padding:18px 34px; white-space:nowrap;
+    color:#fff; font-size:16px; text-decoration:none;
   }
   .ticker-item:hover{color:#FBE7E9;}
   .ticker-item .tag{
-    font-family:'IBM Plex Mono'; font-size:9.5px; font-weight:700; letter-spacing:0.05em;
+    font-family:'IBM Plex Mono'; font-size:11px; font-weight:700; letter-spacing:0.05em;
     text-transform:uppercase; color:#fff; background:rgba(255,255,255,0.20);
-    padding:2px 8px; border-radius:10px; flex-shrink:0;
+    padding:4px 10px; border-radius:12px; flex-shrink:0;
   }
-  .ticker-sep{width:1px; height:14px; background:rgba(255,255,255,0.25); flex-shrink:0;}
+  .ticker-sep{width:1px; height:18px; background:rgba(255,255,255,0.25); flex-shrink:0;}
 
   @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; } }
   @media (max-width:560px){
-    .ticker-badge{padding:0 12px 20px 12px; font-size:10px;}
-    .ticker-item{padding:10px 18px; font-size:12px;}
+    .ticker-badge{padding:0 14px 0 14px; padding-right:22px; font-size:11px;}
+    .ticker-item{padding:14px 22px; font-size:13px;}
   }
 </style>
 </head>
