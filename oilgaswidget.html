@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O&amp;G Trending News</title>
+<!--
+  Photo credits (Pexels License — free to use, attribution appreciated):
+    Aron Razif ............ offshore platforms, Sarawak Malaysia
+    Jakub Pabis ........... refinery plant & tanker wagons, Trzebinia
+    Matheus Bertelli ...... conference speaker
+    RDNE Stock project .... corporate presentation
+    Quang Nguyen Vinh ..... solar + wind farm
+    Lio Voo ............... barge and tugboats
+    Heru Dharma ........... offshore rig with supply vessel
+  Full list: https://www.pexels.com/license/
+-->
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:transparent;overflow:hidden;}
@@ -29,7 +40,11 @@
     min-width:100%;flex-shrink:0;height:100%;position:relative;
     display:block;text-decoration:none;color:inherit;
   }
-  .slide img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+  .slide img{
+    width:100%;height:100%;
+    object-fit:cover;object-position:center;
+    display:block;background:#0a1a20;
+  }
   .slide::after{
     content:"";position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(to top,
@@ -118,27 +133,31 @@
 /* =====================================================================
    SETTINGS
    ===================================================================== */
-var SLIDE_MS    = 10000;  /* how long each slide stays on screen. 0 = manual only */
-var EDITION_HOUR = 7;     /* new edition starts at 07:00 local time each day     */
+var SLIDE_MS     = 10000;  /* 10s per slide. 0 = manual only */
+var EDITION_HOUR = 7;      /* new edition rotates in at 07:00 local time */
+var IMG_WIDTH    = 1920;   /* HD. bump to 2560 for large TV displays */
 
 /* =====================================================================
-   ARTWORK — generated locally, no external image host.
-   To use a real photo: add  photo:'img/01.jpg'  to an item and put the
-   file in the same repo folder. Falls back to artwork if it's missing.
+   PHOTOS — Pexels IDs. Change a photo by swapping its number.
+   Browse pexels.com, open a photo, the number at the end of the URL is
+   the ID:  pexels.com/photo/oil-refinery-plant-15970032/  ->  15970032
+   ===================================================================== */
+function px(id){
+  return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id +
+         '.jpeg?auto=compress&cs=tinysrgb&w=' + IMG_WIDTH;
+}
+
+/* =====================================================================
+   FALLBACK ARTWORK — used only if a photo fails to load (proxy block,
+   Pexels down, wrong ID). Keeps the carousel looking finished.
    ===================================================================== */
 var PALETTE = {
-  teal  : ['#062229','#10454F'],
-  navy  : ['#0D172B','#22304F'],
-  red   : ['#2B0A0F','#661320'],
-  slate : ['#101416','#2A3136'],
-  ocean : ['#07202B','#0E3A46'],
-  moss  : ['#0B211A','#164237']
+  teal:['#062229','#10454F'], navy:['#0D172B','#22304F'], red:['#2B0A0F','#661320'],
+  slate:['#101416','#2A3136'], ocean:['#07202B','#0E3A46'], moss:['#0B211A','#164237']
 };
-
 var MOTIF = {
   derrick:'M100 26 L58 172 M100 26 L142 172 M70 132 H130 M78 102 H122 M86 72 H114 M46 172 H154 M100 26 V10',
   platform:'M22 118 H178 M22 118 L34 104 H166 L178 118 M42 118 V176 M158 118 V176 M74 118 V176 M126 118 V176 M22 176 H178 M104 104 V54 M88 54 H120 M104 54 L104 38',
-  sphere:'M100 104 m-54 0 a54 54 0 1 0 108 0 a54 54 0 1 0 -108 0 M46 104 H154 M100 50 C74 70 74 138 100 158 M100 50 C126 70 126 138 100 158 M72 150 L62 182 M128 150 L138 182',
   expo:'M24 60 H176 M24 60 V50 H176 V60 M40 60 V140 H88 V60 M112 60 V140 H160 V60 M24 168 H176 M52 92 H76 M136 92 H160 M52 116 H76 M136 116 H160',
   transition:'M34 156 L62 92 H150 L122 156 Z M56 118 H136 M78 92 L64 156 M104 92 L94 156 M162 40 m-10 0 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 M162 40 V6 M162 40 L192 58 M162 40 L132 58 M162 50 V176',
   chart:'M28 172 H180 M42 172 V118 H70 V172 M84 172 V86 H112 V172 M126 172 V50 H154 V172 M28 172 V28',
@@ -153,85 +172,82 @@ function art(paletteName, motifName){
   var d = MOTIF[motifName] || MOTIF.derrick;
   var svg =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">' +
-      '<defs>' +
-        '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0" stop-color="' + p[0] + '"/>' +
-          '<stop offset="1" stop-color="' + p[1] + '"/>' +
-        '</linearGradient>' +
-        '<pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">' +
-          '<path d="M0 80 H80 M80 0 V80" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>' +
-        '</pattern>' +
-      '</defs>' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="' + p[0] + '"/><stop offset="1" stop-color="' + p[1] + '"/>' +
+      '</linearGradient>' +
+      '<pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">' +
+        '<path d="M0 80 H80 M80 0 V80" fill="none" stroke="#fff" stroke-opacity=".045" stroke-width="1"/>' +
+      '</pattern></defs>' +
       '<rect width="1600" height="900" fill="url(#g)"/>' +
       '<rect width="1600" height="900" fill="url(#grid)"/>' +
-      '<circle cx="1290" cy="300" r="330" fill="#ffffff" fill-opacity="0.035"/>' +
-      '<g transform="translate(1010 150) scale(3.1)" fill="none" stroke="#ffffff" ' +
-         'stroke-opacity="0.30" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' +
-        '<path d="' + d + '"/>' +
-      '</g>' +
+      '<circle cx="1290" cy="300" r="330" fill="#fff" fill-opacity=".035"/>' +
+      '<g transform="translate(1010 150) scale(3.1)" fill="none" stroke="#fff" stroke-opacity=".30" ' +
+         'stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></g>' +
     '</svg>';
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 
 /* =====================================================================
-   CONTENT POOL — order here is the "day 0" order. Every morning at
-   EDITION_HOUR the deck rotates by one, so a different story leads.
+   CONTENT POOL — day 0 order. Rotates one position every morning at 07:00.
    ===================================================================== */
 var POOL = [
   {title:'MOGSC 2026 — Malaysia O&G Services Sector Outlook',
-   source:'MOGSC', link:'https://www.mogsc.org', palette:'teal', motif:'derrick'},
+   source:'MOGSC', link:'https://www.mogsc.org',
+   photo:9336586,  palette:'teal',  motif:'platform'},   /* offshore platforms, Sarawak */
 
   {title:'PETRONAS Awards New Upstream Contracts in Malaysia',
    source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
-   palette:'ocean', motif:'platform'},
+   photo:9336590,  palette:'ocean', motif:'platform'},   /* drone, platform complex */
 
   {title:'Malaysia Oil & Gas Sector Targets RM 30B Revenue in 2026',
-   source:'MOGSC', link:'https://www.mogsc.org', palette:'red', motif:'chart'},
+   source:'MOGSC', link:'https://www.mogsc.org',
+   photo:15970032, palette:'red',   motif:'chart'},      /* refinery + pipelines */
 
   {title:'MUPEX 2026 — Upstream Petroleum Exhibition Preview',
-   source:'MUPEX', link:'https://www.mupex.com.my', palette:'navy', motif:'expo'},
+   source:'MUPEX', link:'https://www.mupex.com.my',
+   photo:29708266, palette:'navy',  motif:'expo'},       /* conference speaker */
 
   {title:'OGA 2026 Conference Highlights Malaysia Energy Transition',
-   source:'OGA', link:'https://www.ogashow.com', palette:'moss', motif:'transition'},
+   source:'OGA', link:'https://www.ogashow.com',
+   photo:35105427, palette:'moss',  motif:'transition'}, /* solar + wind, sunrise */
 
   {title:'Malaysian Oil Services Companies Report Strong Q2 2026 Results',
    source:'Bursa Malaysia', link:'https://www.bursamalaysia.com',
-   palette:'slate', motif:'chart'},
+   photo:7648050,  palette:'slate', motif:'chart'},      /* corporate briefing */
 
   {title:'Sarawak Onshore Production Milestone — AKW First Oil Achieved',
-   source:'Upstream', link:'https://www.petronas.com', palette:'teal', motif:'wellhead'},
+   source:'Upstream', link:'https://www.petronas.com',
+   photo:15970028, palette:'teal',  motif:'wellhead'},   /* onshore facility, rail loading */
 
   {title:'Malaysia Advances Renewable Energy Integration in Offshore Operations',
-   source:'MOGSC', link:'https://www.mogsc.org', palette:'moss', motif:'hybrid'},
+   source:'MOGSC', link:'https://www.mogsc.org',
+   photo:35259449, palette:'moss',  motif:'hybrid'},     /* plant + turbine + solar */
 
   {title:'Asia Pacific LNG Demand Growth Supports Malaysia Upstream Investment',
-   source:'PETRONAS', link:'https://www.petronas.com', palette:'ocean', motif:'tanker'},
+   source:'PETRONAS', link:'https://www.petronas.com',
+   photo:13178759, palette:'ocean', motif:'tanker'},     /* barge + tugboats at sea */
 
   {title:'PETRONAS Carigali Expands HUC Contracts for Malaysia Shelf Projects',
    source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
-   palette:'navy', motif:'pipeline'}
+   photo:36594202, palette:'navy',  motif:'pipeline'}    /* rig + supply vessel */
 ];
 
 /* =====================================================================
-   EDITION — which day are we on? The day flips at EDITION_HOUR, not midnight.
+   EDITION — the day flips at EDITION_HOUR, not midnight.
    ===================================================================== */
 function editionDay(){
-  var shifted = new Date(Date.now() - EDITION_HOUR * 3600000);
-  return Math.floor(
-    Date.UTC(shifted.getFullYear(), shifted.getMonth(), shifted.getDate()) / 86400000
-  );
+  var s = new Date(Date.now() - EDITION_HOUR * 3600000);
+  return Math.floor(Date.UTC(s.getFullYear(), s.getMonth(), s.getDate()) / 86400000);
 }
-
 function todaysDeck(){
   var off = ((editionDay() % POOL.length) + POOL.length) % POOL.length;
   return POOL.slice(off).concat(POOL.slice(0, off));
 }
-
-function freshness(position){
-  if(position === 0) return 'Just now';
-  if(position === 1) return 'Yesterday';
-  if(position < 7)  return position + 'd ago';
-  return Math.floor(position / 7) + 'w ago';
+function freshness(pos){
+  if(pos === 0) return 'Just now';
+  if(pos === 1) return 'Yesterday';
+  if(pos < 7)  return pos + 'd ago';
+  return Math.floor(pos / 7) + 'w ago';
 }
 
 /* =====================================================================
@@ -256,8 +272,6 @@ function render(){
   dotsEl.innerHTML = '';
 
   deck.forEach(function(it,i){
-    var fallback = art(it.palette, it.motif);
-
     var a = document.createElement('a');
     a.className = 'slide';
     a.href = it.link || '#';
@@ -270,8 +284,10 @@ function render(){
     var img = document.createElement('img');
     img.alt = '';
     img.loading = i ? 'lazy' : 'eager';
-    img.src = it.photo || fallback;
-    img.addEventListener('error', function(){ img.src = fallback; }, {once:true});
+    img.src = it.photo ? px(it.photo) : art(it.palette, it.motif);
+    img.addEventListener('error', function(){
+      img.src = art(it.palette, it.motif);      /* photo blocked or missing */
+    }, {once:true});
 
     var cap = document.createElement('div');
     cap.className = 'cap';
@@ -294,7 +310,7 @@ function render(){
   dots = [].slice.call(dotsEl.children);
   track.style.transition = 'none';
   goTo(0);
-  void track.offsetWidth;                 /* flush, so slide 1 doesn't slide in */
+  void track.offsetWidth;
   track.style.transition = '';
   start();
 }
@@ -342,13 +358,10 @@ car.addEventListener('touchend', function(e){
   x0 = null; start();
 }, {passive:true});
 
-/* pause when the tab is hidden; also catch the 07:00 flip on wake */
 document.addEventListener('visibilitychange', function(){
   if(document.hidden){ stop(); return; }
   editionDay() !== currentEdition ? render() : start();
 });
-
-/* watch for the 07:00 boundary on screens left open overnight */
 setInterval(function(){
   if(editionDay() !== currentEdition) render();
 }, 60000);
