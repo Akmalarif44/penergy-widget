@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O&amp;G Trending News</title>
 <!--
-  Photo credits (Pexels License — free to use, attribution appreciated):
-    Aron Razif ............ offshore platforms, Sarawak Malaysia
-    Jakub Pabis ........... refinery plant & tanker wagons, Trzebinia
-    Matheus Bertelli ...... conference speaker
-    RDNE Stock project .... corporate presentation
-    Quang Nguyen Vinh ..... solar + wind farm
-    Lio Voo ............... barge and tugboats
-    Heru Dharma ........... offshore rig with supply vessel
-  Full list: https://www.pexels.com/license/
+  All 10 photo IDs verified against their Pexels download URL.
+  Photo credits (Pexels License - free to use, attribution appreciated):
+    Aron Razif ............ offshore platforms, Sarawak Malaysia (9336586, 9336590)
+    Jakub Pabis ........... refinery plant / tanker wagons  (15970032, 15970028)
+    Matheus Bertelli ...... conference stage               (29708266, 29708259)
+    Quang Nguyen Vinh ..... solar + wind farm              (35105427, 35105460)
+    Lio Voo ............... barge and tugboats             (13178759)
+    Heru Dharma ........... rig with supply vessel         (36594202)
+  License: https://www.pexels.com/license/
 -->
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -29,11 +29,12 @@
     --cap-bottom:58px;
     --dots-bottom:20px;
     --title:28px;
+    --glide:.6s;          /* how long the slide takes to move across */
   }
 
   .car{position:relative;width:100%;height:100%;overflow:hidden;background:#0a1a20;}
 
-  .track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
+  .track{display:flex;height:100%;transition:transform var(--glide) cubic-bezier(.4,0,.2,1);}
   @media (prefers-reduced-motion:reduce){.track{transition:none;}}
 
   .slide{
@@ -133,23 +134,29 @@
 /* =====================================================================
    SETTINGS
    ===================================================================== */
-var SLIDE_MS     = 10000;  /* 10s per slide. 0 = manual only */
+var SLIDE_MS     = 10000;  /* <-- 10 SECONDS per slide. 0 = manual only */
 var EDITION_HOUR = 7;      /* new edition rotates in at 07:00 local time */
-var IMG_WIDTH    = 1920;   /* HD. bump to 2560 for large TV displays */
+var IMG_WIDTH    = 1920;   /* HD. bump to 2560 for a large TV display    */
 
 /* =====================================================================
-   PHOTOS — Pexels IDs. Change a photo by swapping its number.
-   Browse pexels.com, open a photo, the number at the end of the URL is
-   the ID:  pexels.com/photo/oil-refinery-plant-15970032/  ->  15970032
+   PEXELS URL BUILDER
+   To swap a photo: open pexels.com, find one, the number at the end of
+   the page URL is the ID.
+       pexels.com/photo/oil-refinery-plant-15970032/  ->  15970032
+   ALWAYS open the photo page first - IDs taken from a search listing are
+   not always real, which is what broke the last two slides.
    ===================================================================== */
-function px(id){
+function px(id, w){
   return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id +
-         '.jpeg?auto=compress&cs=tinysrgb&w=' + IMG_WIDTH;
+         '.jpeg?auto=compress&cs=tinysrgb&w=' + (w || IMG_WIDTH);
+}
+function pxPlain(id){   /* no resize params - last resort before artwork */
+  return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg';
 }
 
 /* =====================================================================
-   FALLBACK ARTWORK — used only if a photo fails to load (proxy block,
-   Pexels down, wrong ID). Keeps the carousel looking finished.
+   FALLBACK ARTWORK — shows only if the photo can't load (proxy block,
+   Pexels down, bad ID). Keeps the slide looking finished either way.
    ===================================================================== */
 var PALETTE = {
   teal:['#062229','#10454F'], navy:['#0D172B','#22304F'], red:['#2B0A0F','#661320'],
@@ -188,48 +195,58 @@ function art(paletteName, motifName){
 }
 
 /* =====================================================================
-   CONTENT POOL — day 0 order. Rotates one position every morning at 07:00.
+   CONTENT POOL — day 0 order. Rotates one position every day at 07:00.
    ===================================================================== */
 var POOL = [
   {title:'MOGSC 2026 — Malaysia O&G Services Sector Outlook',
    source:'MOGSC', link:'https://www.mogsc.org',
-   photo:9336586,  palette:'teal',  motif:'platform'},   /* offshore platforms, Sarawak */
+   photo:9336586,  palette:'teal',  motif:'platform'},
+   /* aerial: offshore platforms off Sarawak */
 
   {title:'PETRONAS Awards New Upstream Contracts in Malaysia',
    source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
-   photo:9336590,  palette:'ocean', motif:'platform'},   /* drone, platform complex */
+   photo:9336590,  palette:'ocean', motif:'platform'},
+   /* drone: large platform complex, deep blue water */
 
   {title:'Malaysia Oil & Gas Sector Targets RM 30B Revenue in 2026',
    source:'MOGSC', link:'https://www.mogsc.org',
-   photo:15970032, palette:'red',   motif:'chart'},      /* refinery + pipelines */
+   photo:15970032, palette:'red',   motif:'chart'},
+   /* refinery plant with pipeline network */
 
   {title:'MUPEX 2026 — Upstream Petroleum Exhibition Preview',
    source:'MUPEX', link:'https://www.mupex.com.my',
-   photo:29708266, palette:'navy',  motif:'expo'},       /* conference speaker */
+   photo:29708266, palette:'navy',  motif:'expo'},
+   /* speaker on stage at a conference */
 
   {title:'OGA 2026 Conference Highlights Malaysia Energy Transition',
    source:'OGA', link:'https://www.ogashow.com',
-   photo:35105427, palette:'moss',  motif:'transition'}, /* solar + wind, sunrise */
+   photo:35105427, palette:'moss',  motif:'transition'},
+   /* solar farm + wind turbines at sunrise */
 
   {title:'Malaysian Oil Services Companies Report Strong Q2 2026 Results',
    source:'Bursa Malaysia', link:'https://www.bursamalaysia.com',
-   photo:7648050,  palette:'slate', motif:'chart'},      /* corporate briefing */
+   photo:29708259, palette:'slate', motif:'chart'},
+   /* presenter with data on screen - reads as a results briefing */
 
   {title:'Sarawak Onshore Production Milestone — AKW First Oil Achieved',
    source:'Upstream', link:'https://www.petronas.com',
-   photo:15970028, palette:'teal',  motif:'wellhead'},   /* onshore facility, rail loading */
+   photo:15970028, palette:'teal',  motif:'wellhead'},
+   /* onshore facility with rail tanker loading */
 
   {title:'Malaysia Advances Renewable Energy Integration in Offshore Operations',
    source:'MOGSC', link:'https://www.mogsc.org',
-   photo:35259449, palette:'moss',  motif:'hybrid'},     /* plant + turbine + solar */
+   photo:35105460, palette:'moss',  motif:'hybrid'},
+   /* solar + wind farm at sunset - different light to slide 5 */
 
   {title:'Asia Pacific LNG Demand Growth Supports Malaysia Upstream Investment',
    source:'PETRONAS', link:'https://www.petronas.com',
-   photo:13178759, palette:'ocean', motif:'tanker'},     /* barge + tugboats at sea */
+   photo:13178759, palette:'ocean', motif:'tanker'},
+   /* heavy cargo barge under tow at sea */
 
   {title:'PETRONAS Carigali Expands HUC Contracts for Malaysia Shelf Projects',
    source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
-   photo:36594202, palette:'navy',  motif:'pipeline'}    /* rig + supply vessel */
+   photo:36594202, palette:'navy',  motif:'pipeline'}
+   /* offshore rig alongside a supply vessel */
 ];
 
 /* =====================================================================
@@ -264,6 +281,21 @@ function esc(s){
   });
 }
 
+/* photo -> plain photo -> artwork */
+function buildImage(it, eager){
+  var img = document.createElement('img');
+  img.alt = '';
+  img.loading = eager ? 'eager' : 'lazy';
+  var stage = 0;
+  img.addEventListener('error', function(){
+    stage++;
+    if(stage === 1 && it.photo){ img.src = pxPlain(it.photo); return; }
+    img.src = art(it.palette, it.motif);
+  });
+  img.src = it.photo ? px(it.photo) : art(it.palette, it.motif);
+  return img;
+}
+
 function render(){
   stop();
   currentEdition = editionDay();
@@ -281,21 +313,13 @@ function render(){
     a.setAttribute('aria-roledescription','slide');
     a.setAttribute('aria-label', (i+1) + ' of ' + deck.length);
 
-    var img = document.createElement('img');
-    img.alt = '';
-    img.loading = i ? 'lazy' : 'eager';
-    img.src = it.photo ? px(it.photo) : art(it.palette, it.motif);
-    img.addEventListener('error', function(){
-      img.src = art(it.palette, it.motif);      /* photo blocked or missing */
-    }, {once:true});
-
     var cap = document.createElement('div');
     cap.className = 'cap';
     cap.innerHTML = '<h2>' + esc(it.title) + '</h2>'
                   + '<div class="meta">' + esc(it.source)
                   + '<span class="sep">&middot;</span>' + freshness(i) + '</div>';
 
-    a.appendChild(img);
+    a.appendChild(buildImage(it, i === 0));
     a.appendChild(cap);
     track.appendChild(a);
 
