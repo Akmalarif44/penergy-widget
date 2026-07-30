@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MOGSC News Carousel</title>
+<title>O&amp;G Trending News</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:transparent;overflow:hidden;}
@@ -13,8 +13,14 @@
     -webkit-font-smoothing:antialiased;
   }
 
-  /* ---------- FRAME ---------- */
-  .car{position:relative;width:100%;height:100%;overflow:hidden;background:#1b1b1b;}
+  :root{
+    --inset:32px;
+    --cap-bottom:58px;
+    --dots-bottom:20px;
+    --title:28px;
+  }
+
+  .car{position:relative;width:100%;height:100%;overflow:hidden;background:#0a1a20;}
 
   .track{display:flex;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);}
   @media (prefers-reduced-motion:reduce){.track{transition:none;}}
@@ -27,28 +33,33 @@
   .slide::after{
     content:"";position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(to top,
-      rgba(0,0,0,.88) 0%,
-      rgba(0,0,0,.62) 22%,
-      rgba(0,0,0,.18) 48%,
-      rgba(0,0,0,0) 72%);
+      rgba(0,0,0,.86) 0%,
+      rgba(0,0,0,.58) 24%,
+      rgba(0,0,0,.16) 50%,
+      rgba(0,0,0,0) 74%);
   }
 
   /* ---------- CAPTION ---------- */
   .cap{
-    position:absolute;left:32px;right:32px;bottom:50px;z-index:2;
-    max-width:72%;color:#fff;pointer-events:none;
+    position:absolute;
+    left:var(--inset);right:var(--inset);bottom:var(--cap-bottom);
+    z-index:2;color:#fff;pointer-events:none;
+    max-width:calc(100% - (var(--inset) * 2));
   }
   .cap h2{
-    font-size:28px;font-weight:600;line-height:1.28;letter-spacing:-.01em;
-    text-shadow:0 1px 3px rgba(0,0,0,.45);
+    font-size:var(--title);font-weight:600;line-height:1.25;letter-spacing:-.012em;
+    text-shadow:0 1px 4px rgba(0,0,0,.5);
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
   .cap .meta{
-    margin-top:10px;font-size:13px;font-weight:400;
-    color:rgba(255,255,255,.85);text-shadow:0 1px 2px rgba(0,0,0,.4);
+    margin-top:8px;font-size:13px;font-weight:400;line-height:1;
+    color:rgba(255,255,255,.82);text-shadow:0 1px 2px rgba(0,0,0,.45);
   }
+  .cap .meta .sep{margin:0 7px;opacity:.55;}
 
-  /* ---------- ARROWS (SharePoint style) ---------- */
+  @media (min-width:900px){ .cap{max-width:66%;} }
+
+  /* ---------- ARROWS ---------- */
   .nav{
     position:absolute;top:50%;transform:translateY(-50%);z-index:3;
     width:40px;height:40px;border:none;border-radius:50%;
@@ -57,20 +68,21 @@
     opacity:0;transition:opacity .15s ease,background .15s ease;
   }
   .car:hover .nav,.nav:focus-visible{opacity:1;}
-  .nav:hover{background:rgba(0,0,0,.72);}
+  .nav:hover{background:rgba(0,0,0,.74);}
   .nav:focus-visible{outline:2px solid #fff;outline-offset:2px;}
-  .nav.prev{left:16px;} .nav.next{right:16px;}
+  .nav.prev{left:20px;} .nav.next{right:20px;}
   .nav svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.2;
            stroke-linecap:round;stroke-linejoin:round;}
 
   /* ---------- DOTS ---------- */
   .dots{
-    position:absolute;left:0;right:0;bottom:16px;z-index:3;
+    position:absolute;left:0;right:0;bottom:var(--dots-bottom);z-index:3;
     display:flex;justify-content:center;align-items:center;gap:8px;
+    height:8px;line-height:0;
   }
   .dot{
     width:8px;height:8px;padding:0;border:none;border-radius:50%;
-    background:rgba(255,255,255,.45);cursor:pointer;
+    background:rgba(255,255,255,.42);cursor:pointer;flex:0 0 auto;
     transition:background .15s ease,transform .15s ease;
   }
   .dot:hover{background:rgba(255,255,255,.85);}
@@ -79,8 +91,7 @@
 
   /* ---------- MOBILE ---------- */
   @media (max-width:640px){
-    .cap{left:20px;right:20px;bottom:42px;max-width:100%;}
-    .cap h2{font-size:18px;}
+    :root{--inset:20px;--cap-bottom:46px;--dots-bottom:16px;--title:18px;}
     .cap .meta{font-size:11px;margin-top:6px;}
     .nav{width:32px;height:32px;opacity:1;}
     .nav.prev{left:8px;} .nav.next{right:8px;}
@@ -90,7 +101,7 @@
 </head>
 <body>
 
-<div class="car" id="car" role="region" aria-roledescription="carousel" aria-label="Malaysia O&amp;G and MOGSC news">
+<div class="car" id="car" role="region" aria-roledescription="carousel" aria-label="O&amp;G trending news">
   <div class="track" id="track" aria-live="polite"></div>
 
   <button class="nav prev" id="prev" aria-label="Previous news">
@@ -105,61 +116,131 @@
 
 <script>
 /* =====================================================================
-   CONTENT — edit here. daysAgo controls the "2d ago" text automatically.
+   SETTINGS
    ===================================================================== */
-var DAY = 86400000;
-var ITEMS = [
+var SLIDE_MS    = 10000;  /* how long each slide stays on screen. 0 = manual only */
+var EDITION_HOUR = 7;     /* new edition starts at 07:00 local time each day     */
+
+/* =====================================================================
+   ARTWORK — generated locally, no external image host.
+   To use a real photo: add  photo:'img/01.jpg'  to an item and put the
+   file in the same repo folder. Falls back to artwork if it's missing.
+   ===================================================================== */
+var PALETTE = {
+  teal  : ['#062229','#10454F'],
+  navy  : ['#0D172B','#22304F'],
+  red   : ['#2B0A0F','#661320'],
+  slate : ['#101416','#2A3136'],
+  ocean : ['#07202B','#0E3A46'],
+  moss  : ['#0B211A','#164237']
+};
+
+var MOTIF = {
+  derrick:'M100 26 L58 172 M100 26 L142 172 M70 132 H130 M78 102 H122 M86 72 H114 M46 172 H154 M100 26 V10',
+  platform:'M22 118 H178 M22 118 L34 104 H166 L178 118 M42 118 V176 M158 118 V176 M74 118 V176 M126 118 V176 M22 176 H178 M104 104 V54 M88 54 H120 M104 54 L104 38',
+  sphere:'M100 104 m-54 0 a54 54 0 1 0 108 0 a54 54 0 1 0 -108 0 M46 104 H154 M100 50 C74 70 74 138 100 158 M100 50 C126 70 126 138 100 158 M72 150 L62 182 M128 150 L138 182',
+  expo:'M24 60 H176 M24 60 V50 H176 V60 M40 60 V140 H88 V60 M112 60 V140 H160 V60 M24 168 H176 M52 92 H76 M136 92 H160 M52 116 H76 M136 116 H160',
+  transition:'M34 156 L62 92 H150 L122 156 Z M56 118 H136 M78 92 L64 156 M104 92 L94 156 M162 40 m-10 0 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 M162 40 V6 M162 40 L192 58 M162 40 L132 58 M162 50 V176',
+  chart:'M28 172 H180 M42 172 V118 H70 V172 M84 172 V86 H112 V172 M126 172 V50 H154 V172 M28 172 V28',
+  wellhead:'M100 18 V132 M84 132 H116 L100 178 Z M66 56 H134 M66 88 H134 M100 132 m-28 0 a28 28 0 1 0 56 0 M44 178 H156',
+  hybrid:'M100 44 m-18 0 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0 M100 12 V22 M100 66 V76 M68 44 H58 M142 44 H132 M30 168 L56 112 H162 L136 168 Z M52 140 H146 M78 112 L66 168 M110 112 L102 168',
+  tanker:'M24 112 H180 L160 154 H44 Z M100 112 V56 M100 56 H144 M56 112 V84 H84 V112 M118 112 V90 H144 V112 M12 166 H192 M32 166 Q50 158 68 166 T104 166 T140 166 T176 166',
+  pipeline:'M12 82 H188 M12 130 H188 M46 74 V90 M96 74 V90 M146 74 V90 M46 122 V138 M96 122 V138 M146 122 V138 M96 90 V122 M96 106 m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 M96 90 V70'
+};
+
+function art(paletteName, motifName){
+  var p = PALETTE[paletteName] || PALETTE.teal;
+  var d = MOTIF[motifName] || MOTIF.derrick;
+  var svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">' +
+      '<defs>' +
+        '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0" stop-color="' + p[0] + '"/>' +
+          '<stop offset="1" stop-color="' + p[1] + '"/>' +
+        '</linearGradient>' +
+        '<pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">' +
+          '<path d="M0 80 H80 M80 0 V80" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>' +
+        '</pattern>' +
+      '</defs>' +
+      '<rect width="1600" height="900" fill="url(#g)"/>' +
+      '<rect width="1600" height="900" fill="url(#grid)"/>' +
+      '<circle cx="1290" cy="300" r="330" fill="#ffffff" fill-opacity="0.035"/>' +
+      '<g transform="translate(1010 150) scale(3.1)" fill="none" stroke="#ffffff" ' +
+         'stroke-opacity="0.30" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="' + d + '"/>' +
+      '</g>' +
+    '</svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* =====================================================================
+   CONTENT POOL — order here is the "day 0" order. Every morning at
+   EDITION_HOUR the deck rotates by one, so a different story leads.
+   ===================================================================== */
+var POOL = [
   {title:'MOGSC 2026 — Malaysia O&G Services Sector Outlook',
-   source:'MOGSC', daysAgo:0, link:'https://www.mogsc.org',
-   img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80'},
+   source:'MOGSC', link:'https://www.mogsc.org', palette:'teal', motif:'derrick'},
 
   {title:'PETRONAS Awards New Upstream Contracts in Malaysia',
-   source:'PETRONAS', daysAgo:1, link:'https://www.petronas.com/media/press-release',
-   img:'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80'},
+   source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
+   palette:'ocean', motif:'platform'},
 
   {title:'Malaysia Oil & Gas Sector Targets RM 30B Revenue in 2026',
-   source:'MOGSC', daysAgo:2, link:'https://www.mogsc.org',
-   img:'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=1600&q=80'},
+   source:'MOGSC', link:'https://www.mogsc.org', palette:'red', motif:'chart'},
 
   {title:'MUPEX 2026 — Upstream Petroleum Exhibition Preview',
-   source:'MUPEX', daysAgo:3, link:'https://www.mupex.com.my',
-   img:'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1600&q=80'},
+   source:'MUPEX', link:'https://www.mupex.com.my', palette:'navy', motif:'expo'},
 
   {title:'OGA 2026 Conference Highlights Malaysia Energy Transition',
-   source:'OGA', daysAgo:4, link:'https://www.ogashow.com',
-   img:'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1600&q=80'},
+   source:'OGA', link:'https://www.ogashow.com', palette:'moss', motif:'transition'},
 
   {title:'Malaysian Oil Services Companies Report Strong Q2 2026 Results',
-   source:'Bursa Malaysia', daysAgo:5, link:'https://www.bursamalaysia.com',
-   img:'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1600&q=80'},
+   source:'Bursa Malaysia', link:'https://www.bursamalaysia.com',
+   palette:'slate', motif:'chart'},
 
   {title:'Sarawak Onshore Production Milestone — AKW First Oil Achieved',
-   source:'Upstream', daysAgo:6, link:'https://www.petronas.com',
-   img:'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=1600&q=80'},
+   source:'Upstream', link:'https://www.petronas.com', palette:'teal', motif:'wellhead'},
 
   {title:'Malaysia Advances Renewable Energy Integration in Offshore Operations',
-   source:'MOGSC', daysAgo:7, link:'https://www.mogsc.org',
-   img:'https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?w=1600&q=80'},
+   source:'MOGSC', link:'https://www.mogsc.org', palette:'moss', motif:'hybrid'},
 
   {title:'Asia Pacific LNG Demand Growth Supports Malaysia Upstream Investment',
-   source:'PETRONAS', daysAgo:8, link:'https://www.petronas.com',
-   img:'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80'},
+   source:'PETRONAS', link:'https://www.petronas.com', palette:'ocean', motif:'tanker'},
 
   {title:'PETRONAS Carigali Expands HUC Contracts for Malaysia Shelf Projects',
-   source:'PETRONAS', daysAgo:9, link:'https://www.petronas.com/media/press-release',
-   img:'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600&q=80'}
+   source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
+   palette:'navy', motif:'pipeline'}
 ];
 
-var AUTOPLAY_MS = 6000;   /* set 0 to switch autoplay off */
-var FALLBACK_IMG = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=80';
+/* =====================================================================
+   EDITION — which day are we on? The day flips at EDITION_HOUR, not midnight.
+   ===================================================================== */
+function editionDay(){
+  var shifted = new Date(Date.now() - EDITION_HOUR * 3600000);
+  return Math.floor(
+    Date.UTC(shifted.getFullYear(), shifted.getMonth(), shifted.getDate()) / 86400000
+  );
+}
+
+function todaysDeck(){
+  var off = ((editionDay() % POOL.length) + POOL.length) % POOL.length;
+  return POOL.slice(off).concat(POOL.slice(0, off));
+}
+
+function freshness(position){
+  if(position === 0) return 'Just now';
+  if(position === 1) return 'Yesterday';
+  if(position < 7)  return position + 'd ago';
+  return Math.floor(position / 7) + 'w ago';
+}
 
 /* =====================================================================
    ENGINE
    ===================================================================== */
-var track = document.getElementById('track');
+var track  = document.getElementById('track');
 var dotsEl = document.getElementById('dots');
-var car = document.getElementById('car');
-var idx = 0, timer = null;
+var car    = document.getElementById('car');
+var idx = 0, timer = null, dots = [], deck = [], currentEdition = null;
 
 function esc(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
@@ -167,43 +248,74 @@ function esc(s){
   });
 }
 
-function timeAgo(days){
-  if(days <= 0) return 'Just now';
-  if(days === 1) return 'Yesterday';
-  if(days < 7) return days + 'd ago';
-  var w = Math.floor(days/7);
-  return w + (w === 1 ? 'w ago' : 'w ago');
+function render(){
+  stop();
+  currentEdition = editionDay();
+  deck = todaysDeck();
+  track.innerHTML = '';
+  dotsEl.innerHTML = '';
+
+  deck.forEach(function(it,i){
+    var fallback = art(it.palette, it.motif);
+
+    var a = document.createElement('a');
+    a.className = 'slide';
+    a.href = it.link || '#';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.setAttribute('role','group');
+    a.setAttribute('aria-roledescription','slide');
+    a.setAttribute('aria-label', (i+1) + ' of ' + deck.length);
+
+    var img = document.createElement('img');
+    img.alt = '';
+    img.loading = i ? 'lazy' : 'eager';
+    img.src = it.photo || fallback;
+    img.addEventListener('error', function(){ img.src = fallback; }, {once:true});
+
+    var cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.innerHTML = '<h2>' + esc(it.title) + '</h2>'
+                  + '<div class="meta">' + esc(it.source)
+                  + '<span class="sep">&middot;</span>' + freshness(i) + '</div>';
+
+    a.appendChild(img);
+    a.appendChild(cap);
+    track.appendChild(a);
+
+    var d = document.createElement('button');
+    d.className = 'dot';
+    d.setAttribute('role','tab');
+    d.setAttribute('aria-label','News ' + (i+1));
+    d.dataset.i = i;
+    dotsEl.appendChild(d);
+  });
+
+  dots = [].slice.call(dotsEl.children);
+  track.style.transition = 'none';
+  goTo(0);
+  void track.offsetWidth;                 /* flush, so slide 1 doesn't slide in */
+  track.style.transition = '';
+  start();
 }
 
-track.innerHTML = ITEMS.map(function(it,i){
-  return '<a class="slide" href="' + esc(it.link || '#') + '" target="_blank" rel="noopener" '
-       + 'role="group" aria-roledescription="slide" aria-label="' + (i+1) + ' of ' + ITEMS.length + '">'
-       +   '<img src="' + esc(it.img) + '" alt="" loading="' + (i ? 'lazy' : 'eager') + '" '
-       +        'onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">'
-       +   '<div class="cap">'
-       +     '<h2>' + esc(it.title) + '</h2>'
-       +     '<div class="meta">' + esc(it.source) + ' &nbsp;·&nbsp; ' + timeAgo(it.daysAgo) + '</div>'
-       +   '</div>'
-       + '</a>';
-}).join('');
-
-dotsEl.innerHTML = ITEMS.map(function(_,i){
-  return '<button class="dot' + (i===0 ? ' active' : '') + '" role="tab" '
-       + 'aria-label="News ' + (i+1) + '" data-i="' + i + '"></button>';
-}).join('');
-
-var dots = [].slice.call(dotsEl.children);
-
 function goTo(n){
-  idx = (n + ITEMS.length) % ITEMS.length;
+  idx = (n + deck.length) % deck.length;
   track.style.transform = 'translateX(-' + (idx * 100) + '%)';
   dots.forEach(function(d,i){
     d.classList.toggle('active', i === idx);
     d.setAttribute('aria-selected', i === idx ? 'true' : 'false');
   });
 }
-
 function move(dir){ goTo(idx + dir); restart(); }
+
+function start(){
+  if(!SLIDE_MS || deck.length < 2) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  timer = setInterval(function(){ goTo(idx + 1); }, SLIDE_MS);
+}
+function stop(){ clearInterval(timer); timer = null; }
+function restart(){ stop(); start(); }
 
 dotsEl.addEventListener('click', function(e){
   var b = e.target.closest('.dot');
@@ -212,26 +324,15 @@ dotsEl.addEventListener('click', function(e){
 document.getElementById('prev').addEventListener('click', function(){ move(-1); });
 document.getElementById('next').addEventListener('click', function(){ move(1); });
 
-function start(){
-  if(!AUTOPLAY_MS || ITEMS.length < 2) return;
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  timer = setInterval(function(){ goTo(idx + 1); }, AUTOPLAY_MS);
-}
-function stop(){ clearInterval(timer); timer = null; }
-function restart(){ stop(); start(); }
-
 car.addEventListener('mouseenter', stop);
 car.addEventListener('mouseleave', start);
 car.addEventListener('focusin', stop);
 car.addEventListener('focusout', start);
-document.addEventListener('visibilitychange', function(){ document.hidden ? stop() : start(); });
-
 car.addEventListener('keydown', function(e){
   if(e.key === 'ArrowRight') move(1);
-  if(e.key === 'ArrowLeft') move(-1);
+  if(e.key === 'ArrowLeft')  move(-1);
 });
 
-/* swipe */
 var x0 = null;
 car.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; stop(); }, {passive:true});
 car.addEventListener('touchend', function(e){
@@ -241,8 +342,18 @@ car.addEventListener('touchend', function(e){
   x0 = null; start();
 }, {passive:true});
 
-goTo(0);
-start();
+/* pause when the tab is hidden; also catch the 07:00 flip on wake */
+document.addEventListener('visibilitychange', function(){
+  if(document.hidden){ stop(); return; }
+  editionDay() !== currentEdition ? render() : start();
+});
+
+/* watch for the 07:00 boundary on screens left open overnight */
+setInterval(function(){
+  if(editionDay() !== currentEdition) render();
+}, 60000);
+
+render();
 </script>
 </body>
 </html>
