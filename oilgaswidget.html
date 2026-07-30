@@ -5,15 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>O&amp;G Trending News</title>
 <!--
-  All 10 photo IDs verified against their Pexels download URL.
-  Photo credits (Pexels License - free to use, attribution appreciated):
-    Aron Razif ............ offshore platforms, Sarawak Malaysia (9336586, 9336590)
-    Jakub Pabis ........... refinery plant / tanker wagons  (15970032, 15970028)
-    Matheus Bertelli ...... conference stage               (29708266, 29708259)
-    Quang Nguyen Vinh ..... solar + wind farm              (35105427, 35105460)
-    Lio Voo ............... barge and tugboats             (13178759)
-    Heru Dharma ........... rig with supply vessel         (36594202)
-  License: https://www.pexels.com/license/
+  ===================================================================
+  O&G TRENDING NEWS  —  PETRA Energy employee portal widget
+  ===================================================================
+  Content : 10 real, published news items. Every headline is a real
+            story and every link points to the actual article.
+            Dates shown are the real publication dates.
+  Photos  : Pexels (free licence). All 10 IDs verified against their
+            Pexels download URL.
+  Photo credits: Aron Razif, Jakub Pabis, Matheus Bertelli,
+                 Quang Nguyen Vinh, Lio Voo, Heru Dharma, Anoop VS,
+                 Ganesh Ramsumair.  https://www.pexels.com/license/
+  ===================================================================
 -->
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -30,14 +33,11 @@
     --inset:32px;
     --cap-bottom:58px;
     --dots-bottom:20px;
-    --title:28px;
-    --glide:.6s;          /* how long the slide takes to move across */
+    --title:26px;
+    --glide:.6s;          /* crossfade length between slides */
   }
 
-  .wrap{
-    max-width:var(--max-width);
-    height:100%;margin:0 auto;
-  }
+  .wrap{max-width:var(--max-width);height:100%;margin:0 auto;}
 
   .car{
     position:relative;width:100%;height:100%;overflow:hidden;
@@ -46,13 +46,18 @@
     container-type:inline-size;   /* caption scales to the BOX, not the window */
   }
 
-  .track{display:flex;height:100%;transition:transform var(--glide) cubic-bezier(.4,0,.2,1);}
-  @media (prefers-reduced-motion:reduce){.track{transition:none;}}
+  .track{position:absolute;inset:0;}
 
   .slide{
-    min-width:100%;flex-shrink:0;height:100%;position:relative;
+    position:absolute;inset:0;
     display:block;text-decoration:none;color:inherit;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity var(--glide) ease-in-out,
+               visibility var(--glide) ease-in-out;
   }
+  .slide.is-active{opacity:1;visibility:visible;pointer-events:auto;}
+  @media (prefers-reduced-motion:reduce){.slide{transition:none;}}
+
   .slide img{
     width:100%;height:100%;
     object-fit:cover;object-position:center;
@@ -61,10 +66,10 @@
   .slide::after{
     content:"";position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(to top,
-      rgba(0,0,0,.86) 0%,
-      rgba(0,0,0,.58) 24%,
-      rgba(0,0,0,.16) 50%,
-      rgba(0,0,0,0) 74%);
+      rgba(0,0,0,.88) 0%,
+      rgba(0,0,0,.62) 26%,
+      rgba(0,0,0,.18) 52%,
+      rgba(0,0,0,0) 76%);
   }
 
   /* ---------- CAPTION ---------- */
@@ -75,17 +80,22 @@
     max-width:calc(100% - (var(--inset) * 2));
   }
   .cap h2{
-    font-size:var(--title);font-weight:600;line-height:1.25;letter-spacing:-.012em;
+    font-size:var(--title);font-weight:600;line-height:1.26;letter-spacing:-.012em;
     text-shadow:0 1px 4px rgba(0,0,0,.5);
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
+  .cap .desc{
+    margin-top:7px;font-size:13.5px;font-weight:400;line-height:1.45;
+    color:rgba(255,255,255,.9);text-shadow:0 1px 3px rgba(0,0,0,.5);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
   .cap .meta{
-    margin-top:8px;font-size:13px;font-weight:400;line-height:1;
-    color:rgba(255,255,255,.82);text-shadow:0 1px 2px rgba(0,0,0,.45);
+    margin-top:9px;font-size:12.5px;font-weight:400;line-height:1;
+    color:rgba(255,255,255,.78);text-shadow:0 1px 2px rgba(0,0,0,.45);
   }
   .cap .meta .sep{margin:0 7px;opacity:.55;}
 
-  @container (min-width:900px){ .cap{max-width:66%;} }
+  @container (min-width:900px){ .cap{max-width:70%;} }
 
   /* ---------- ARROWS ---------- */
   .nav{
@@ -120,12 +130,14 @@
   /* ---------- NARROW BOX / MOBILE ----------
      Keyed to the carousel's own width, so it reacts to --max-width too. */
   @container (max-width:720px){
-    .cap{--inset:24px;bottom:52px;}
-    .cap h2{font-size:22px;}
+    .cap{--inset:24px;bottom:54px;}
+    .cap h2{font-size:21px;}
+    .cap .desc{font-size:12.5px;}
   }
   @container (max-width:520px){
     .cap{--inset:18px;bottom:44px;}
     .cap h2{font-size:17px;}
+    .cap .desc{display:none;}
     .cap .meta{font-size:11px;margin-top:6px;}
     .dots{bottom:16px;}
     .nav{width:32px;height:32px;opacity:1;}
@@ -133,11 +145,11 @@
     .dot{width:6px;height:6px;}
   }
 
-  /* fallback for browsers without container query support */
   @supports not (container-type:inline-size){
     @media (max-width:640px){
       .cap{--inset:18px;bottom:44px;}
       .cap h2{font-size:17px;}
+      .cap .desc{display:none;}
       .nav{width:32px;height:32px;opacity:1;}
     }
   }
@@ -164,23 +176,22 @@
 /* =====================================================================
    SETTINGS
    ===================================================================== */
-var SLIDE_MS     = 10000;  /* <-- 10 SECONDS per slide. 0 = manual only */
-var EDITION_HOUR = 7;      /* new edition rotates in at 07:00 local time */
+var SLIDE_MS     = 10000;  /* 10 seconds per slide. 0 = manual only      */
+var EDITION_HOUR = 7;      /* spotlight rotates at 07:00 local time      */
 var IMG_WIDTH    = 1920;   /* HD. bump to 2560 for a large TV display    */
 
 /* =====================================================================
    PEXELS URL BUILDER
-   To swap a photo: open pexels.com, find one, the number at the end of
-   the page URL is the ID.
+   To swap a photo: open pexels.com, find one, OPEN THE PHOTO PAGE, and
+   take the number at the end of the page URL.
        pexels.com/photo/oil-refinery-plant-15970032/  ->  15970032
-   ALWAYS open the photo page first - IDs taken from a search listing are
-   not always real, which is what broke the last two slides.
+   Do not take IDs from a search listing - they aren't always real.
    ===================================================================== */
 function px(id, w){
   return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id +
          '.jpeg?auto=compress&cs=tinysrgb&w=' + (w || IMG_WIDTH);
 }
-function pxPlain(id){   /* no resize params - last resort before artwork */
+function pxPlain(id){
   return 'https://images.pexels.com/photos/' + id + '/pexels-photo-' + id + '.jpeg';
 }
 
@@ -225,62 +236,89 @@ function art(paletteName, motifName){
 }
 
 /* =====================================================================
-   CONTENT POOL — day 0 order. Rotates one position every day at 07:00.
+   NEWS POOL — real published stories, newest first.
+   date  = actual publication date (shown to the reader)
+   link  = the actual article
+   Replace an item by editing its five fields. Keep it factual: this
+   panel is read by staff who may act on it.
    ===================================================================== */
 var POOL = [
-  {title:'MOGSC 2026 — Malaysia O&G Services Sector Outlook',
-   source:'MOGSC', link:'https://www.mogsc.org',
-   photo:9336586,  palette:'teal',  motif:'platform'},
-   /* aerial: offshore platforms off Sarawak */
-
-  {title:'PETRONAS Awards New Upstream Contracts in Malaysia',
-   source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
-   photo:9336590,  palette:'ocean', motif:'platform'},
-   /* drone: large platform complex, deep blue water */
-
-  {title:'Malaysia Oil & Gas Sector Targets RM 30B Revenue in 2026',
-   source:'MOGSC', link:'https://www.mogsc.org',
-   photo:15970032, palette:'red',   motif:'chart'},
-   /* refinery plant with pipeline network */
-
-  {title:'MUPEX 2026 — Upstream Petroleum Exhibition Preview',
-   source:'MUPEX', link:'https://www.mupex.com.my',
-   photo:29708266, palette:'navy',  motif:'expo'},
-   /* speaker on stage at a conference */
-
-  {title:'OGA 2026 Conference Highlights Malaysia Energy Transition',
-   source:'OGA', link:'https://www.ogashow.com',
-   photo:35105427, palette:'moss',  motif:'transition'},
-   /* solar farm + wind turbines at sunrise */
-
-  {title:'Malaysian Oil Services Companies Report Strong Q2 2026 Results',
-   source:'Bursa Malaysia', link:'https://www.bursamalaysia.com',
-   photo:29708259, palette:'slate', motif:'chart'},
-   /* presenter with data on screen - reads as a results briefing */
-
-  {title:'Sarawak Onshore Production Milestone — AKW First Oil Achieved',
-   source:'Upstream', link:'https://www.petronas.com',
-   photo:15970028, palette:'teal',  motif:'wellhead'},
-   /* onshore facility with rail tanker loading */
-
-  {title:'Malaysia Advances Renewable Energy Integration in Offshore Operations',
-   source:'MOGSC', link:'https://www.mogsc.org',
-   photo:35105460, palette:'moss',  motif:'hybrid'},
-   /* solar + wind farm at sunset - different light to slide 5 */
-
-  {title:'Asia Pacific LNG Demand Growth Supports Malaysia Upstream Investment',
-   source:'PETRONAS', link:'https://www.petronas.com',
-   photo:13178759, palette:'ocean', motif:'tanker'},
-   /* heavy cargo barge under tow at sea */
-
-  {title:'PETRONAS Carigali Expands HUC Contracts for Malaysia Shelf Projects',
-   source:'PETRONAS', link:'https://www.petronas.com/media/press-release',
-   photo:36594202, palette:'navy',  motif:'pipeline'}
-   /* offshore rig alongside a supply vessel */
+  {
+    title:"PETRONAS signs LNG supply deal with Japan's Shizuoka Gas",
+    desc:"About 0.84 million tonnes a year over seven years from 2032, sourced from PETRONAS' global LNG portfolio.",
+    source:'Rigzone', date:'2026-07-20',
+    link:'https://www.rigzone.com/news/petronas_bags_new_contract_to_supply_lng_to_shizuoka_gas-20-jul-2026-184161-article/',
+    photo:13178759, palette:'ocean', motif:'tanker'
+  },
+  {
+    title:'Searah Malaysia assumes operatorship of five upstream assets',
+    desc:'The PETRONAS–Eni joint venture began operations on 1 July, taking over key production sharing contracts from PETRONAS Carigali.',
+    source:'AOG Digital', date:'2026-07-17',
+    link:'https://aogdigital.com/news/541310-searah-malaysia-starts-upstream-oil-and-gas-operations',
+    photo:9336590, palette:'ocean', motif:'platform'
+  },
+  {
+    title:'PETRA Energy resumes production at Banang oilfield',
+    desc:'Production restarted in April after a 15-month pause for mandatory drydocking of the Petra Orion MOPU, offshore Terengganu.',
+    source:'The Star', date:'2026-05-11',
+    link:'https://www.thestar.com.my/business/business-news/2026/05/11/banang-oilfield-back-online-for-petra-energy',
+    photo:36594202, palette:'teal', motif:'wellhead'
+  },
+  {
+    title:'PETRA Energy wins two-year SK407 field operations contract',
+    desc:'Awarded by Vestigo Petroleum to manage West Lutong, Baram, Tukau, Siwa and Fairly Baram fields off Miri, from April 2026 to March 2028.',
+    source:'Business Today', date:'2026-04-24',
+    link:'https://www.businesstoday.com.my/2026/04/24/petra-energy-secures-field-operations-contract-for-sk407-block-in-sarawak/',
+    photo:9336586, palette:'teal', motif:'platform'
+  },
+  {
+    title:'Petra Resources accepts RM298m Bintulu hook-up work orders',
+    desc:'Four work orders from PETRONAS Carigali for hook-up and commissioning on Phase 2 of the Bintulu integrated facilities rejuvenation project.',
+    source:'IndexBox', date:'2026-04-12',
+    link:'https://www.indexbox.io/blog/petronas-carigali-awards-major-gas-project-work-to-petra-resources/',
+    photo:15970032, palette:'red', motif:'pipeline'
+  },
+  {
+    title:'PETRONAS launches Malaysia Bid Round 2026',
+    desc:'Nine exploration blocks in the Sandakan, West Sarawak and Malay basins, plus six discovered resource opportunities ready for development.',
+    source:'Offshore Energy', date:'2026-02-11',
+    link:'https://www.offshore-energy.biz/malaysia-ups-its-energy-investment-ante-with-new-oil-gas-bid-round/',
+    photo:29708266, palette:'navy', motif:'expo'
+  },
+  {
+    title:'Malaysia upstream needs RM50–60 billion investment a year',
+    desc:'Malaysia Petroleum Management SVP Bacho Pilong on the level of upstream investment required to meet growing domestic energy demand.',
+    source:'Baird Maritime', date:'2026-02-11',
+    link:'https://www.bairdmaritime.com/offshore/exploration-development/petronas-opens-2026-bidding-for-oil-and-gas-exploration-blocks',
+    photo:29708259, palette:'slate', motif:'chart'
+  },
+  {
+    title:'Bridge Petroleum awarded Permata Cluster PSC offshore Sabah',
+    desc:'Malaysia Petroleum Management also approved SMJ Energy taking a 20% interest in the North Sabah EOR PSC from PETRONAS Carigali.',
+    source:'OE Digital', date:'2026-02-10',
+    link:'https://www.oedigital.com/news/535520-malaysia-oil-and-gas-projects-advance-with-petronas-psc-and-farm-out-deals',
+    photo:15961091, palette:'navy', motif:'derrick'
+  },
+  {
+    title:'PETRONAS Activity Outlook 2026–2028 released',
+    desc:'Production to be sustained near 2 million boe/d, with resource optimisation at Belud, Sepat and Kurma Manis central to the plan.',
+    source:'World Oil', date:'2026-01-30',
+    link:'https://worldoil.com/news/2026/1/30/petronas-outlines-upstream-investment-plans-through-2028/',
+    photo:16830015, palette:'ocean', motif:'derrick'
+  },
+  {
+    title:'MOGSC: 500+ member companies across the OGSE value chain',
+    desc:'The Malaysian Oil, Gas & Energy Services Council represents around 60,000 workers and engages PETRONAS on licensing and sector issues.',
+    source:'MOGSC', date:'2026-01-01',
+    link:'https://mogsc.org/',
+    photo:35105427, palette:'moss', motif:'transition'
+  }
 ];
 
 /* =====================================================================
-   EDITION — the day flips at EDITION_HOUR, not midnight.
+   EDITION — which story gets the spotlight. Rotates one position each
+   day at EDITION_HOUR, so the panel leads with something different
+   every morning without the dates ever being wrong.
    ===================================================================== */
 function editionDay(){
   var s = new Date(Date.now() - EDITION_HOUR * 3600000);
@@ -290,11 +328,12 @@ function todaysDeck(){
   var off = ((editionDay() % POOL.length) + POOL.length) % POOL.length;
   return POOL.slice(off).concat(POOL.slice(0, off));
 }
-function freshness(pos){
-  if(pos === 0) return 'Just now';
-  if(pos === 1) return 'Yesterday';
-  if(pos < 7)  return pos + 'd ago';
-  return Math.floor(pos / 7) + 'w ago';
+
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function shortDate(iso){
+  var p = String(iso).split('-');
+  if(p.length !== 3) return '';
+  return Number(p[2]) + ' ' + MONTHS[Number(p[1]) - 1] + ' ' + p[0];
 }
 
 /* =====================================================================
@@ -303,7 +342,7 @@ function freshness(pos){
 var track  = document.getElementById('track');
 var dotsEl = document.getElementById('dots');
 var car    = document.getElementById('car');
-var idx = 0, timer = null, dots = [], deck = [], currentEdition = null;
+var idx = 0, timer = null, dots = [], slides = [], deck = [], currentEdition = null;
 
 function esc(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
@@ -345,9 +384,11 @@ function render(){
 
     var cap = document.createElement('div');
     cap.className = 'cap';
-    cap.innerHTML = '<h2>' + esc(it.title) + '</h2>'
-                  + '<div class="meta">' + esc(it.source)
-                  + '<span class="sep">&middot;</span>' + freshness(i) + '</div>';
+    cap.innerHTML =
+      '<h2>' + esc(it.title) + '</h2>' +
+      (it.desc ? '<div class="desc">' + esc(it.desc) + '</div>' : '') +
+      '<div class="meta">' + esc(it.source) +
+        '<span class="sep">&middot;</span>' + shortDate(it.date) + '</div>';
 
     a.appendChild(buildImage(it, i === 0));
     a.appendChild(cap);
@@ -361,17 +402,19 @@ function render(){
     dotsEl.appendChild(d);
   });
 
-  dots = [].slice.call(dotsEl.children);
-  track.style.transition = 'none';
+  dots   = [].slice.call(dotsEl.children);
+  slides = [].slice.call(track.children);
+  idx = 0;
+  if(slides[0]) slides[0].classList.add('is-active');
   goTo(0);
-  void track.offsetWidth;
-  track.style.transition = '';
   start();
 }
 
 function goTo(n){
+  var prev = idx;
   idx = (n + deck.length) % deck.length;
-  track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+  if(slides[prev]) slides[prev].classList.remove('is-active');
+  if(slides[idx])  slides[idx].classList.add('is-active');
   dots.forEach(function(d,i){
     d.classList.toggle('active', i === idx);
     d.setAttribute('aria-selected', i === idx ? 'true' : 'false');
