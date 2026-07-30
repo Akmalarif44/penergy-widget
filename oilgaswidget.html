@@ -8,14 +8,14 @@
   ===================================================================
   O&G TRENDING NEWS  —  PETRA Energy employee portal widget
   ===================================================================
-  Content : 10 real, published news items. Every headline is a real
-            story and every link points to the actual article.
-            Dates shown are the real publication dates.
-  Photos  : Pexels (free licence). All 10 IDs verified against their
+  Order   : fixed, newest story first. Add a new item at the TOP of
+            POOL and it becomes the lead slide.
+  Content : 10 real published stories with their real publication
+            dates and links. Last content review: 30 July 2026.
+  Photos  : Pexels (free licence). Every ID verified against its
             Pexels download URL.
-  Photo credits: Aron Razif, Jakub Pabis, Matheus Bertelli,
-                 Quang Nguyen Vinh, Lio Voo, Heru Dharma, Anoop VS,
-                 Ganesh Ramsumair.  https://www.pexels.com/license/
+  Credits : Aron Razif, Jakub Pabis, Matheus Bertelli, Lio Voo,
+            Heru Dharma, Anoop VS.   pexels.com/license/
   ===================================================================
 -->
 <style>
@@ -34,9 +34,8 @@
     --cap-bottom:58px;
     --dots-bottom:20px;
     --title:26px;
-    /* NOTE: this is the FADE length only (how long one image dissolves
-       into the next). The 10-second gap between slides is SLIDE_MS in
-       the script below - don't change this one to set the interval. */
+    /* FADE length only (one image dissolving into the next). The
+       10-second gap between slides is SLIDE_MS in the script below. */
     --glide:.5s;
   }
 
@@ -146,8 +145,7 @@
   .pp[aria-pressed="true"] .ico-pause{display:none;}
   .pp[aria-pressed="true"] .ico-play{display:block;}
 
-  /* ---------- NARROW BOX / MOBILE ----------
-     Keyed to the carousel's own width, so it reacts to --max-width too. */
+  /* ---------- NARROW BOX / MOBILE ---------- */
   @container (max-width:720px){
     .cap{--inset:24px;bottom:54px;}
     .cap h2{font-size:21px;}
@@ -202,9 +200,8 @@
 /* =====================================================================
    SETTINGS
    ===================================================================== */
-var SLIDE_MS     = 10000;  /* 10 seconds per slide. 0 = manual only      */
-var EDITION_HOUR = 7;      /* spotlight rotates at 07:00 local time      */
-var IMG_WIDTH    = 1920;   /* HD. bump to 2560 for a large TV display    */
+var SLIDE_MS  = 10000;  /* 10 seconds per slide. 0 = manual only      */
+var IMG_WIDTH = 1920;   /* HD. bump to 2560 for a large TV display    */
 
 /* =====================================================================
    PEXELS URL BUILDER
@@ -233,12 +230,11 @@ var MOTIF = {
   derrick:'M100 26 L58 172 M100 26 L142 172 M70 132 H130 M78 102 H122 M86 72 H114 M46 172 H154 M100 26 V10',
   platform:'M22 118 H178 M22 118 L34 104 H166 L178 118 M42 118 V176 M158 118 V176 M74 118 V176 M126 118 V176 M22 176 H178 M104 104 V54 M88 54 H120 M104 54 L104 38',
   expo:'M24 60 H176 M24 60 V50 H176 V60 M40 60 V140 H88 V60 M112 60 V140 H160 V60 M24 168 H176 M52 92 H76 M136 92 H160 M52 116 H76 M136 116 H160',
-  transition:'M34 156 L62 92 H150 L122 156 Z M56 118 H136 M78 92 L64 156 M104 92 L94 156 M162 40 m-10 0 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0 M162 40 V6 M162 40 L192 58 M162 40 L132 58 M162 50 V176',
   chart:'M28 172 H180 M42 172 V118 H70 V172 M84 172 V86 H112 V172 M126 172 V50 H154 V172 M28 172 V28',
   wellhead:'M100 18 V132 M84 132 H116 L100 178 Z M66 56 H134 M66 88 H134 M100 132 m-28 0 a28 28 0 1 0 56 0 M44 178 H156',
-  hybrid:'M100 44 m-18 0 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0 M100 12 V22 M100 66 V76 M68 44 H58 M142 44 H132 M30 168 L56 112 H162 L136 168 Z M52 140 H146 M78 112 L66 168 M110 112 L102 168',
   tanker:'M24 112 H180 L160 154 H44 Z M100 112 V56 M100 56 H144 M56 112 V84 H84 V112 M118 112 V90 H144 V112 M12 166 H192 M32 166 Q50 158 68 166 T104 166 T140 166 T176 166',
-  pipeline:'M12 82 H188 M12 130 H188 M46 74 V90 M96 74 V90 M146 74 V90 M46 122 V138 M96 122 V138 M146 122 V138 M96 90 V122 M96 106 m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 M96 90 V70'
+  pipeline:'M12 82 H188 M12 130 H188 M46 74 V90 M96 74 V90 M146 74 V90 M46 122 V138 M96 122 V138 M146 122 V138 M96 90 V122 M96 106 m-16 0 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0 M96 90 V70',
+  tank:'M40 70 H160 V166 H40 Z M40 96 H160 M40 122 H160 M40 148 H160 M56 70 V44 H144 V70 M100 44 V22 M24 176 H176'
 };
 
 function art(paletteName, motifName){
@@ -262,26 +258,53 @@ function art(paletteName, motifName){
 }
 
 /* =====================================================================
-   NEWS POOL — real published stories, newest first.
-   date  = actual publication date (shown to the reader)
-   link  = the actual article
-   Replace an item by editing its five fields. Keep it factual: this
-   panel is read by staff who may act on it.
+   NEWS POOL — NEWEST FIRST. Slide 1 is always the top entry here.
+   To add a story: paste a new block at the top of this list and delete
+   the oldest one at the bottom. Keep it to 10 so the dots stay tidy.
+   Fields: title / desc / source / date (YYYY-MM-DD) / link / photo
    ===================================================================== */
 var POOL = [
   {
-    title:"PETRONAS signs LNG supply deal with Japan's Shizuoka Gas",
-    desc:"About 0.84 million tonnes a year over seven years from 2032, sourced from PETRONAS' global LNG portfolio.",
-    source:'Rigzone', date:'2026-07-20',
-    link:'https://www.rigzone.com/news/petronas_bags_new_contract_to_supply_lng_to_shizuoka_gas-20-jul-2026-184161-article/',
+    title:'Higher gas prices set to lift Gas Malaysia earnings 16% in FY27',
+    desc:'RHB Research expects the Malaysia Reference Price to climb 28% next year, tracking this year\u2019s 21% rise in Brent with a nine-month lag.',
+    source:'The Star', date:'2026-07-27',
+    link:'https://www.thestar.com.my/business/business-news/2026/07/27/higher-prices-to-bolster-gas-malaysia-profit',
+    photo:29708259, palette:'slate', motif:'chart'
+  },
+  {
+    title:'Another PETRONAS tanker due in Melaka by early August',
+    desc:'The Prime Minister said the vessel will sail from Yanbu, Saudi Arabia through the Red Sea after clearance was granted.',
+    source:'The Star', date:'2026-07-24',
+    link:'https://www.thestar.com.my/news/nation/2026/07/24/another-petronas-tanker-set-to-arrive-in-early-august-says-pm',
     photo:13178759, palette:'ocean', motif:'tanker'
   },
   {
+    title:"PETRONAS signs LNG supply deal with Japan's Shizuoka Gas",
+    desc:'PETRONAS LNG will supply about 0.84 million tonnes a year for seven years from 2032, extending a partnership of three decades.',
+    source:'Rigzone', date:'2026-07-20',
+    link:'https://www.rigzone.com/news/petronas_bags_new_contract_to_supply_lng_to_shizuoka_gas-20-jul-2026-184161-article/',
+    photo:15893881, palette:'navy', motif:'tank'
+  },
+  {
     title:'Searah Malaysia assumes operatorship of five upstream assets',
-    desc:'The PETRONAS–Eni joint venture began operations on 1 July, taking over key production sharing contracts from PETRONAS Carigali.',
+    desc:'The PETRONAS\u2013Eni joint venture began operations on 1 July, taking over production sharing contracts from PETRONAS Carigali.',
     source:'AOG Digital', date:'2026-07-17',
     link:'https://aogdigital.com/news/541310-searah-malaysia-starts-upstream-oil-and-gas-operations',
     photo:9336590, palette:'ocean', motif:'platform'
+  },
+  {
+    title:"Opinion: Malaysia's next O&G advantage will be physics-native AI",
+    desc:'The Edge argues that Strait of Hormuz disruption has tied energy security directly to food and industrial supply costs, making resource optimisation a national priority.',
+    source:'The Edge Malaysia', date:'2026-07-13',
+    link:'https://www.klsescreener.com/v2/news/view/1757607/My_Say_Malaysia_s_next_oil_and_gas_advantage_will_be_physics_native_AI',
+    photo:29708266, palette:'navy', motif:'expo'
+  },
+  {
+    title:'Malaysia fuel supply secured to end-July amid Hormuz disruption',
+    desc:'PETRONAS extended its assurance by a month as Brent averaged around US$111. Subsidised fuel quotas were trimmed and civil servants moved to work-from-home to conserve supply.',
+    source:'OilPrice.com', date:'2026-05-25',
+    link:'https://oilprice.com/Latest-Energy-News/World-News/Malaysia-Secures-Fuel-Supply-Through-End-of-July.html',
+    photo:15970028, palette:'red', motif:'tank'
   },
   {
     title:'PETRA Energy resumes production at Banang oilfield',
@@ -306,54 +329,12 @@ var POOL = [
   },
   {
     title:'PETRONAS launches Malaysia Bid Round 2026',
-    desc:'Nine exploration blocks in the Sandakan, West Sarawak and Malay basins, plus six discovered resource opportunities ready for development.',
+    desc:'Nine exploration blocks across the Sandakan, West Sarawak and Malay basins, plus six discovered resource opportunities ready for development.',
     source:'Offshore Energy', date:'2026-02-11',
     link:'https://www.offshore-energy.biz/malaysia-ups-its-energy-investment-ante-with-new-oil-gas-bid-round/',
-    photo:29708266, palette:'navy', motif:'expo'
-  },
-  {
-    title:'Malaysia upstream needs RM50–60 billion investment a year',
-    desc:'Malaysia Petroleum Management SVP Bacho Pilong on the level of upstream investment required to meet growing domestic energy demand.',
-    source:'Baird Maritime', date:'2026-02-11',
-    link:'https://www.bairdmaritime.com/offshore/exploration-development/petronas-opens-2026-bidding-for-oil-and-gas-exploration-blocks',
-    photo:29708259, palette:'slate', motif:'chart'
-  },
-  {
-    title:'Bridge Petroleum awarded Permata Cluster PSC offshore Sabah',
-    desc:'Malaysia Petroleum Management also approved SMJ Energy taking a 20% interest in the North Sabah EOR PSC from PETRONAS Carigali.',
-    source:'OE Digital', date:'2026-02-10',
-    link:'https://www.oedigital.com/news/535520-malaysia-oil-and-gas-projects-advance-with-petronas-psc-and-farm-out-deals',
-    photo:15961091, palette:'navy', motif:'derrick'
-  },
-  {
-    title:'PETRONAS Activity Outlook 2026–2028 released',
-    desc:'Production to be sustained near 2 million boe/d, with resource optimisation at Belud, Sepat and Kurma Manis central to the plan.',
-    source:'World Oil', date:'2026-01-30',
-    link:'https://worldoil.com/news/2026/1/30/petronas-outlines-upstream-investment-plans-through-2028/',
-    photo:16830015, palette:'ocean', motif:'derrick'
-  },
-  {
-    title:'MOGSC: 500+ member companies across the OGSE value chain',
-    desc:'The Malaysian Oil, Gas & Energy Services Council represents around 60,000 workers and engages PETRONAS on licensing and sector issues.',
-    source:'MOGSC', date:'2026-01-01',
-    link:'https://mogsc.org/',
-    photo:35105427, palette:'moss', motif:'transition'
+    photo:15961091, palette:'ocean', motif:'derrick'
   }
 ];
-
-/* =====================================================================
-   EDITION — which story gets the spotlight. Rotates one position each
-   day at EDITION_HOUR, so the panel leads with something different
-   every morning without the dates ever being wrong.
-   ===================================================================== */
-function editionDay(){
-  var s = new Date(Date.now() - EDITION_HOUR * 3600000);
-  return Math.floor(Date.UTC(s.getFullYear(), s.getMonth(), s.getDate()) / 86400000);
-}
-function todaysDeck(){
-  var off = ((editionDay() % POOL.length) + POOL.length) % POOL.length;
-  return POOL.slice(off).concat(POOL.slice(0, off));
-}
 
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function shortDate(iso){
@@ -368,7 +349,7 @@ function shortDate(iso){
 var track  = document.getElementById('track');
 var dotsEl = document.getElementById('dots');
 var car    = document.getElementById('car');
-var idx = 0, timer = null, dots = [], slides = [], deck = [], currentEdition = null;
+var idx = 0, timer = null, dots = [], slides = [];
 var userPaused = false;
 
 function esc(s){
@@ -394,12 +375,10 @@ function buildImage(it, eager){
 
 function render(){
   stop();
-  currentEdition = editionDay();
-  deck = todaysDeck();
   track.innerHTML = '';
   dotsEl.innerHTML = '';
 
-  deck.forEach(function(it,i){
+  POOL.forEach(function(it,i){
     var a = document.createElement('a');
     a.className = 'slide';
     a.href = it.link || '#';
@@ -407,7 +386,7 @@ function render(){
     a.rel = 'noopener';
     a.setAttribute('role','group');
     a.setAttribute('aria-roledescription','slide');
-    a.setAttribute('aria-label', (i+1) + ' of ' + deck.length);
+    a.setAttribute('aria-label', (i+1) + ' of ' + POOL.length);
 
     var cap = document.createElement('div');
     cap.className = 'cap';
@@ -439,7 +418,7 @@ function render(){
 
 function goTo(n){
   var prev = idx;
-  idx = (n + deck.length) % deck.length;
+  idx = (n + slides.length) % slides.length;
   if(slides[prev]) slides[prev].classList.remove('is-active');
   if(slides[idx])  slides[idx].classList.add('is-active');
   dots.forEach(function(d,i){
@@ -451,7 +430,7 @@ function move(dir){ goTo(idx + dir); restart(); }
 
 function start(){
   if(userPaused) return;                    /* manual pause wins over hover */
-  if(!SLIDE_MS || deck.length < 2) return;
+  if(!SLIDE_MS || slides.length < 2) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   timer = setInterval(function(){ goTo(idx + 1); }, SLIDE_MS);
 }
@@ -477,10 +456,9 @@ document.getElementById('next').addEventListener('click', function(){ move(1); }
 
 /* ---------------------------------------------------------------------
    TOUCH / SWIPE
-   The slides are <a> tags, so a swipe would otherwise register as a tap
-   and open the article as well as changing slide. We track the gesture,
-   only treat it as a swipe when it's clearly horizontal, and swallow the
-   click that the browser fires afterwards.
+   Slides are <a> tags, so a swipe would otherwise also count as a tap
+   and open the article. Track the gesture, only act on a clearly
+   horizontal one, and swallow the click the browser fires afterwards.
    ------------------------------------------------------------------- */
 var t0 = null, swiped = false;
 
@@ -495,8 +473,6 @@ car.addEventListener('touchend', function(e){
   if(!t0){ start(); return; }
   var dx = e.changedTouches[0].clientX - t0.x;
   var dy = e.changedTouches[0].clientY - t0.y;
-
-  /* horizontal intent only, so page scrolling never flips a slide */
   if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5){
     swiped = true;
     goTo(idx + (dx < 0 ? 1 : -1));
@@ -509,13 +485,8 @@ car.addEventListener('touchcancel', function(){
   t0 = null; swiped = false; start();
 }, {passive:true});
 
-/* a swipe must not also open the article */
 car.addEventListener('click', function(e){
-  if(swiped){
-    e.preventDefault();
-    e.stopPropagation();
-    swiped = false;
-  }
+  if(swiped){ e.preventDefault(); e.stopPropagation(); swiped = false; }
 }, true);
 
 /* hover-to-pause only where hover really exists - on a touch screen the
@@ -532,12 +503,8 @@ car.addEventListener('keydown', function(e){
 });
 
 document.addEventListener('visibilitychange', function(){
-  if(document.hidden){ stop(); return; }
-  editionDay() !== currentEdition ? render() : start();
+  document.hidden ? stop() : start();
 });
-setInterval(function(){
-  if(editionDay() !== currentEdition) render();
-}, 60000);
 
 render();
 </script>
