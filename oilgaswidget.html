@@ -25,6 +25,8 @@
   }
 
   :root{
+    --max-width:760px;    /* narrower box. 100% = full width of the web part */
+    --radius:8px;         /* 0 for hard corners */
     --inset:32px;
     --cap-bottom:58px;
     --dots-bottom:20px;
@@ -32,7 +34,17 @@
     --glide:.6s;          /* how long the slide takes to move across */
   }
 
-  .car{position:relative;width:100%;height:100%;overflow:hidden;background:#0a1a20;}
+  .wrap{
+    max-width:var(--max-width);
+    height:100%;margin:0 auto;
+  }
+
+  .car{
+    position:relative;width:100%;height:100%;overflow:hidden;
+    background:#0a1a20;
+    border-radius:var(--radius);
+    container-type:inline-size;   /* caption scales to the BOX, not the window */
+  }
 
   .track{display:flex;height:100%;transition:transform var(--glide) cubic-bezier(.4,0,.2,1);}
   @media (prefers-reduced-motion:reduce){.track{transition:none;}}
@@ -73,7 +85,7 @@
   }
   .cap .meta .sep{margin:0 7px;opacity:.55;}
 
-  @media (min-width:900px){ .cap{max-width:66%;} }
+  @container (min-width:900px){ .cap{max-width:66%;} }
 
   /* ---------- ARROWS ---------- */
   .nav{
@@ -105,18 +117,35 @@
   .dot.active{background:#fff;transform:scale(1.3);}
   .dot:focus-visible{outline:2px solid #fff;outline-offset:3px;}
 
-  /* ---------- MOBILE ---------- */
-  @media (max-width:640px){
-    :root{--inset:20px;--cap-bottom:46px;--dots-bottom:16px;--title:18px;}
+  /* ---------- NARROW BOX / MOBILE ----------
+     Keyed to the carousel's own width, so it reacts to --max-width too. */
+  @container (max-width:720px){
+    .cap{--inset:24px;bottom:52px;}
+    .cap h2{font-size:22px;}
+  }
+  @container (max-width:520px){
+    .cap{--inset:18px;bottom:44px;}
+    .cap h2{font-size:17px;}
     .cap .meta{font-size:11px;margin-top:6px;}
+    .dots{bottom:16px;}
     .nav{width:32px;height:32px;opacity:1;}
     .nav.prev{left:8px;} .nav.next{right:8px;}
     .dot{width:6px;height:6px;}
+  }
+
+  /* fallback for browsers without container query support */
+  @supports not (container-type:inline-size){
+    @media (max-width:640px){
+      .cap{--inset:18px;bottom:44px;}
+      .cap h2{font-size:17px;}
+      .nav{width:32px;height:32px;opacity:1;}
+    }
   }
 </style>
 </head>
 <body>
 
+<div class="wrap">
 <div class="car" id="car" role="region" aria-roledescription="carousel" aria-label="O&amp;G trending news">
   <div class="track" id="track" aria-live="polite"></div>
 
@@ -128,6 +157,7 @@
   </button>
 
   <div class="dots" id="dots" role="tablist" aria-label="Choose news item"></div>
+</div>
 </div>
 
 <script>
