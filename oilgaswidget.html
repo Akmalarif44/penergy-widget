@@ -450,14 +450,16 @@ function goTo(n){
 }
 function move(dir){ goTo(idx + dir); restart(); }
 
+function stop(){ clearInterval(timer); timer = null; }
+
 function start(){
+  stop();                    /* never leave an orphaned timer running */
   if(userPaused) return;
   if(!SLIDE_MS || slides.length < 2) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   timer = setInterval(function(){ goTo(idx + 1); }, SLIDE_MS);
 }
-function stop(){ clearInterval(timer); timer = null; }
-function restart(){ stop(); start(); }
+function restart(){ start(); }
 
 var ppBtn = document.getElementById('playpause');
 ppBtn.addEventListener('click', function(){
