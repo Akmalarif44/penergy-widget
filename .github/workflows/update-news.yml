@@ -1,0 +1,40 @@
+# =====================================================================
+# Save this as:  .github/workflows/update-news.yml
+# Runs once a day and commits a refreshed news.json to the repo.
+# =====================================================================
+name: Update O&G news
+
+on:
+  schedule:
+    # 22:00 UTC = 06:00 Malaysia time, so the panel is fresh before work.
+    # GitHub queues cron jobs, so it can fire 5-30 minutes late. Fine here.
+    - cron: '0 22 * * *'
+  workflow_dispatch:        # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch headlines
+        run: node scripts/fetch-news.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add news.json
+          if git diff --staged --quiet; then
+            echo "No change today."
+          else
+            git commit -m "News refresh $(date -u +%Y-%m-%d)"
+            git push
+          fi
