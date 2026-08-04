@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ONE-PETRA Ticker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --petra-red: #B41F2E;
     --petra-red-dark: #841720;
     --navy: #0C1B26;
-    --navy-2: #142B3B;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:transparent;}
@@ -27,18 +27,23 @@
   .ticker-badge{
     flex-shrink:0; display:flex; align-items:center; gap:9px;
     background:var(--navy); color:#fff;
-    font-family:'IBM Plex Mono'; font-size:13px; font-weight:700;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:13px; font-weight:700;
     letter-spacing:0.06em; text-transform:uppercase;
-    padding:0 20px; white-space:nowrap; z-index:2;
+    padding:0 30px 0 20px; white-space:nowrap; z-index:2;
     clip-path: polygon(0 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
-    padding-right:30px;
   }
   .live-dot{width:8px;height:8px;border-radius:50%; background:#fff; animation:pulseDot 1.6s ease-in-out infinite; flex-shrink:0;}
   @keyframes pulseDot{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
 
-  .ticker-viewport{flex:1; overflow:hidden; position:relative;}
+  .ticker-viewport{flex:1; overflow:hidden; position:relative; min-width:0;}
+
   .ticker-track{
-    display:flex; align-items:center; gap:0; height:100%;
+    display:flex; align-items:center; height:100%;
+    /* FIX: without this the track is only as wide as the viewport,
+       so translateX(-50%) moves half a viewport instead of one full
+       copy of the content — later items never scroll into view. */
+    width:max-content;
     animation: scrollLeft var(--dur, 38s) linear infinite;
     will-change: transform;
   }
@@ -52,16 +57,21 @@
     color:#fff; font-size:16px; text-decoration:none;
   }
   .ticker-item:hover{color:#FBE7E9;}
+  .ticker-item:focus-visible{outline:2px solid #fff; outline-offset:-4px; border-radius:4px;}
   .ticker-item .tag{
-    font-family:'IBM Plex Mono'; font-size:11px; font-weight:700; letter-spacing:0.05em;
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+    font-size:11px; font-weight:700; letter-spacing:0.05em;
     text-transform:uppercase; color:#fff; background:rgba(255,255,255,0.20);
     padding:4px 10px; border-radius:12px; flex-shrink:0;
   }
   .ticker-sep{width:1px; height:18px; background:rgba(255,255,255,0.25); flex-shrink:0;}
 
-  @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){
+    .ticker-track{ animation:none; }
+    .live-dot{ animation:none; }
+  }
   @media (max-width:560px){
-    .ticker-badge{padding:0 14px 0 14px; padding-right:22px; font-size:11px;}
+    .ticker-badge{padding:0 22px 0 14px; font-size:11px;}
     .ticker-item{padding:14px 22px; font-size:13px;}
   }
 </style>
@@ -77,32 +87,26 @@
 
 <script>
 /* ===========================================================
-   LIVE CONTENT MODE
-   Items are now fetched from items.json (same repo/folder as
-   this file, served via GitHub Pages) instead of being
-   hardcoded here. To update the ticker, edit items.json and
-   push to GitHub — no need to touch this file or SharePoint.
+   ONE-PETRA TICKER — live content from items.json
+   To update the ticker, edit items.json and push to GitHub.
+   No need to touch this file or SharePoint.
 =========================================================== */
 
-const ITEMS_URL = "items.json"; // relative path — assumes same folder on GitHub Pages
-const DURATION_SECONDS = 10;    // lower = faster scroll
+// If this file is loaded INSIDE a SharePoint Embed web part by pasting
+// the HTML directly (rather than pointing the web part at the GitHub
+// Pages URL), a relative path resolves to SharePoint's sandbox domain
+// and will 404. Use the full URL in that case.
+const ITEMS_URL = "items.json";
+// const ITEMS_URL = "https://akmalarif44.github.io/penergy-widget/items.json";
+
+const PIXELS_PER_SECOND = 70;              // higher = faster scroll
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000; // re-check items.json every 5 min
 
-// Fallback content shown only if the fetch fails (network issue,
-// GitHub Pages down, CORS block from within the SharePoint iframe, etc.)
 const FALLBACK_ITEMS = [
   { tag: "Notice", text: "Live feed unavailable — showing cached content.", href: "#" }
 ];
 
-function buildTrackHTML(items){
-  return items.map(i => `
-    <a class="ticker-item" href="${i.href || '#'}">
-      <span class="tag">${escapeHTML(i.tag)}</span>
-      <span>${escapeHTML(i.text)}</span>
-    </a>
-    <span class="ticker-sep"></span>
-  `).join('');
-}
+let lastRenderedKey = null; // avoids restarting the animation on every refresh
 
 function escapeHTML(str){
   const div = document.createElement('div');
@@ -110,30 +114,68 @@ function escapeHTML(str){
   return div.innerHTML;
 }
 
+function buildTrackHTML(items){
+  return items.map(i => `
+    <a class="ticker-item" href="${escapeHTML(i.href || '#')}">
+      <span class="tag">${escapeHTML(i.tag)}</span>
+      <span>${escapeHTML(i.text)}</span>
+    </a>
+    <span class="ticker-sep"></span>
+  `).join('');
+}
+
 async function fetchItems(){
   const res = await fetch(ITEMS_URL + '?_=' + Date.now(), { cache: 'no-store' });
   if(!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   if(!Array.isArray(data) || data.length === 0) throw new Error('Empty or invalid items.json');
-  return data;
+  return data.filter(i => i && i.text);
+}
+
+// Duration is derived from the real rendered width so the scroll speed
+// stays the same no matter how many items are in items.json.
+function applyDuration(track){
+  const oneCopyWidth = track.scrollWidth / 2;
+  if(!oneCopyWidth) return;
+  const seconds = Math.max(oneCopyWidth / PIXELS_PER_SECOND, 8);
+  track.style.setProperty('--dur', seconds.toFixed(1) + 's');
 }
 
 async function render(){
   const track = document.getElementById('tickerTrack');
   let items;
+
   try {
     items = await fetchItems();
   } catch (err) {
     console.warn('[ticker] falling back to static content:', err.message);
     items = FALLBACK_ITEMS;
   }
+
+  // Skip the DOM write if nothing changed — rewriting innerHTML restarts
+  // the CSS animation, which makes the ticker visibly jump every 5 minutes.
+  const key = JSON.stringify(items);
+  if(key === lastRenderedKey) return;
+  lastRenderedKey = key;
+
   const html = buildTrackHTML(items);
-  track.innerHTML = html + html; // duplicate so the scroll loop is seamless
-  track.style.setProperty('--dur', DURATION_SECONDS + 's');
+  track.innerHTML = html + html; // duplicate so the loop is seamless
+
+  // Measure after webfonts land, otherwise the width (and therefore the
+  // duration) is calculated against fallback metrics.
+  await document.fonts.ready;
+  requestAnimationFrame(() => applyDuration(track));
 }
 
 render();
-setInterval(render, REFRESH_INTERVAL_MS); // auto-refresh without reloading the SharePoint page
+setInterval(render, REFRESH_INTERVAL_MS);
+
+// Recalculate on resize so the speed stays consistent across breakpoints.
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => applyDuration(document.getElementById('tickerTrack')), 200);
+});
 </script>
 
 </body>
