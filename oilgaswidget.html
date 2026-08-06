@@ -26,7 +26,9 @@
   }
 
   :root{
-    --max-width:760px;
+    /* Full width of whatever box SharePoint gives us.
+       Set a px value here (e.g. 1100px) to cap it instead. */
+    --max-width:100%;
     --radius:8px;
     --inset:32px;
     --cap-bottom:58px;
@@ -94,7 +96,20 @@
   }
   .cap .meta .sep{margin:0 7px;opacity:.55;}
 
-  @container (min-width:900px){ .cap{max-width:70%;} }
+  /* ---------- WIDE BOX ---------- */
+  /* Bigger type once there is room for it, and the caption is held back
+     from the full width so the headline stays comfortable to read. */
+  @container (min-width:900px){
+    .cap{--inset:40px;max-width:78%;}
+    .cap h2{font-size:30px;}
+    .cap .desc{font-size:14.5px;}
+  }
+  @container (min-width:1200px){
+    .cap{--inset:48px;max-width:72%;bottom:64px;}
+    .cap h2{font-size:34px;}
+    .cap .desc{font-size:15px;margin-top:9px;}
+    .cap .meta{font-size:13px;}
+  }
 
   /* ---------- ARROWS ---------- */
   .nav{
@@ -198,7 +213,7 @@
    SETTINGS
    ===================================================================== */
 var SLIDE_MS  = 10000;         /* 10 seconds per slide. 0 = manual only  */
-var IMG_WIDTH = 1920;          /* HD. bump to 2560 for a large TV        */
+var IMG_WIDTH = 2560;          /* wide box needs the bigger source file  */
 var NEWS_URL  = 'news.json';   /* written daily by GitHub Actions        */
 
 /* =====================================================================
