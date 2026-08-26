@@ -1,13 +1,13 @@
 name: Update PENERGY Price
-
 on:
   schedule:
-    - cron: '*/15 6-9 * * 1-5'
+    - cron: '*/15 1-9 * * 1-5'
   workflow_dispatch:
-
 permissions:
   contents: write
-
+concurrency:
+  group: price-update
+  cancel-in-progress: false
 jobs:
   fetch-price:
     runs-on: ubuntu-latest
@@ -15,16 +15,33 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Fetch price and save JSON
+      - name: Fetch price
         run: |
-          curl -s "https://query1.finance.yahoo.com/v8/finance/chart/5133.KL" \
-            -H "User-Agent: Mozilla/5.0" \
-            -o data.json
+          curl -sfL --retry 3 --retry-delay 5 \
+            "https://query2.finance.yahoo.com/v8/finance/chart/5133.KL?range=3mo&interval=1d" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+            -o tmp.json
+
+      - name: Validate before commit
+        run: |
+          python3 -c "
+          import json,sys
+          d=json.load(open('tmp.json'))
+          r=d['chart']['result'][0]
+          p=r['meta'].get('regularMarketPrice')
+          c=[x for x in r['indicators']['quote'][0].get('close',[]) if x is not None]
+          if p is None or len(c)<2:
+              print('Bad payload, aborting'); sys.exit(1)
+          print(f'OK: price={p}, {len(c)} closes')
+          "
+          mv tmp.json data.json
 
       - name: Commit updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git diff --staged --quiet || git commit -m "Update PENERGY price data"
+          git diff --staged --quiet && exit 0
+          git commit -m "Update PENERGY price data"
+          git pull --rebase
           git push
