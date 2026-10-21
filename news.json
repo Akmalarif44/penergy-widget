@@ -27,22 +27,13 @@
     "motif": "platform"
   },
   {
-    "title": "MISC lines up five more LNG carriers for Petronas",
-    "source": "Splash247",
-    "date": "2026-10-12",
-    "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE1aVWFXaDVQLTcybzREVFJqQ1ZZbmJqNDJxWFAxakVKQVltbkpvaVJCSUtfcHAwWXYwNHI4VnBlZm9xUl9pYmwyVjhpSWh5R1RxR2xIWUZGN3JLMzl2enJPeFhQZHV0NndUbXM2UEVyUHhsbmQxTFNFQjVyLWQ?oc=5",
-    "photo": 15893881,
-    "palette": "navy",
-    "motif": "tank"
-  },
-  {
-    "title": "MISC JV seals Malaysian LNG carrier charter deal",
-    "source": "LNG Prime",
-    "date": "2026-10-12",
-    "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQMzlsNDExMGNoYmltMUdhWG9tSEtzMVJybjNyczV0WWlfaFFZWGpjU2FjbGNLVlVZM3NzVExhOFl0akdEOERRQjEwSTdxMlE3REs0UVhVVWg1dzNFWGZyNFIyY3BHa0lzN2FHVGd4R2xxcmZoUzJZRTN5UlE0bWZiY0NycjlTQVpnNWc?oc=5",
-    "photo": 15893881,
-    "palette": "navy",
-    "motif": "tank"
+    "title": "[UPDATED] Anwar: Malaysia's oil and gas supply secure despite Middle East conflict [WATCH]",
+    "source": "NST Online",
+    "date": "2026-10-13",
+    "link": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNSXZtZVJCekpjZE9TWlVNZGhuN2RZY1ZjamRveWJmSWtoX1NrXzlPbDlLeDJvZ1BfVjlKYmNJY3lkMGxPSW9WdkJRdHJOcUtVcnFjcXpoaGJmWEZGcFhLZlp6WGFsVHNQNHVpYUxBaXFaZ1NiQ0tCVTM5bm1uT19TOE1yWGFyRzZZaExyR2JTNVpfUS1UejVoSTZ1aWtyNlJhSlIyRDhqSzN6NFpZOWZqNEI0elFuRktkYllTM9IBwgFBVV95cUxNa0xwQ0VCTUZzYTN1RFRITWJxbE15MlBBbHFJcTBCZDhPUG9lQTFCS1p0SlplX0htVjgtTV9UVWVRSUxGMUlGZldUU3htNGZtVTRtYWNkZ2JIQkFPTTJuSDVfQWk1NkU0MFVGTURrVzJNS3FrUGZteUxFejBRYkRqV3l3eHBNS1lfZ19vdXdaemhwVHpPd1FLdWdJNVR3LVNZU1d1ZXFhWHlkeWJSWlFCODg3b1pRUzRHc2ZFSTVWckhPQQ?oc=5",
+    "photo": 13178759,
+    "palette": "ocean",
+    "motif": "tanker"
   },
   {
     "title": "Medco Energi to take 10% stake in four Eni oil and gas blocks in Indonesia",
@@ -54,15 +45,6 @@
     "motif": "derrick"
   },
   {
-    "title": "Shell set to start drilling latest well offshore Malaysia",
-    "source": "Upstream Online",
-    "date": "2026-10-12",
-    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPaUdvZURZNnBzUkVKZXhwSGN5bTFoZlZ1cGxEM19OdjZfRGRnbnVXVG8tQ0RNdDVpOHVoaTFYenZQTl95ZmhBZG43MC1USzBZTl9HUXFlQ0lRN2c5RGJMaG1MYXM0ZmFlUjVESHdlTG1lTklNekNXdjdZY09CSUZDRTl3WXhnaFA1YzVUYnc0YWU2aGNPTzBrQkVFTS16WVhDT2pMV1ZnSXJfU2hPajVMZlVR?oc=5",
-    "photo": 36594202,
-    "palette": "teal",
-    "motif": "wellhead"
-  },
-  {
     "title": "Higher Petronas Dividend Could Weigh On Upstream Investments, Analyst Warns",
     "source": "BusinessToday Malaysia",
     "date": "2026-10-11",
@@ -70,6 +52,15 @@
     "photo": 29708259,
     "palette": "slate",
     "motif": "chart"
+  },
+  {
+    "title": "Shell set to start drilling latest well offshore Malaysia",
+    "source": "Upstream Online",
+    "date": "2026-10-11",
+    "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPaUdvZURZNnBzUkVKZXhwSGN5bTFoZlZ1cGxEM19OdjZfRGRnbnVXVG8tQ0RNdDVpOHVoaTFYenZQTl95ZmhBZG43MC1USzBZTl9HUXFlQ0lRN2c5RGJMaG1MYXM0ZmFlUjVESHdlTG1lTklNekNXdjdZY09CSUZDRTl3WXhnaFA1YzVUYnc0YWU2aGNPTzBrQkVFTS16WVhDT2pMV1ZnSXJfU2hPajVMZlVR?oc=5",
+    "photo": 36594202,
+    "palette": "teal",
+    "motif": "wellhead"
   },
   {
     "title": "Petra Energy To Dispose Vessel For RM18 Million To Indonesian Firm",
@@ -85,8 +76,17 @@
     "source": "Free Malaysia Today",
     "date": "2026-10-10",
     "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNR29RRU5sYUZQLThDZERod0t5YlE0RHl3RnUyTG5hZUkzeDZTVXZrRnBfcG5zZ1NCMzMwd3JqdXlLVnh4dTVvdGJRREZfRm55TXRZX3F2ZnZQVWFpbzNnSlBwbWVGRC1ETEozTmIxWF9IMlcxNlYwbGlYTU5YWThTSkJjY3NnN25fcWRJVW5jeGpoUC1pd3NuSVpROTNDenU4Wjh6dHIxOVphd1hxcmRkTkZQTnFKQ1d6alpZ?oc=5",
-    "photo": 9336590,
-    "palette": "ocean",
+    "photo": 16169312,
+    "palette": "navy",
     "motif": "platform"
+  },
+  {
+    "title": "Petra Energy to book RM3m gain from RM18m vessel sale",
+    "source": "The Malaysian Reserve",
+    "date": "2026-10-09",
+    "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxPUFZ4UUZMRk96R051Q3BQMmhXM1kzMm5OMm5ob0lhVTdyX2pnZXhqMWc2RVB1dGJ1dnE1NEUwc2N2cUtOZFhiQ1pHNGlNOUJyd3RqSkpOZ1J3Zl9EN21KSnRmLUtqVU4xbnd4RHlZdDFRSXZKVDF1V0JFNlhGd2VFYmxJRTN3VzBXSW5MV2hzZmxlVTlZODVRRFZKOFlMUQ?oc=5",
+    "photo": 13178759,
+    "palette": "ocean",
+    "motif": "tanker"
   }
 ]
