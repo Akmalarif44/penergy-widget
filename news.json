@@ -1,5 +1,14 @@
 [
   {
+    "title": "Shell steps up exploration offshore Malaysia",
+    "source": "Upstream Online",
+    "date": "2026-11-10",
+    "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOLURvYi1aRHZYaXY0cVB6NVdXSTdZQlpmS1U2MkdXZzFVSXp4XzlGT1puREFtY2t0NnlkWERvTmV6N25USjI3akdvLVhYTzNldXZDNDMzVnpQVjBVSGFkUXNvVll3cDc5d3N1T042QXFtbnljU3pJSG0tRGY3Q1JyZFFSOHdaRkhJeWZVamMxeGFvWEMxclNhNnNPcDc1amZ6?oc=5",
+    "photo": 15961091,
+    "palette": "ocean",
+    "motif": "derrick"
+  },
+  {
     "title": "Velesto’s Jack-Up Rig Up for Drilling Job with Petronas",
     "source": "Offshore Engineer Magazine",
     "date": "2026-11-06",
@@ -31,9 +40,9 @@
     "source": "Upstream Online",
     "date": "2026-11-04",
     "link": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQUFRfTndWSF9PTGd3QlZNa3VvdkhLdFFZQmRlTXZrNzBIQjdVWURMbTNfdzZxb3VJUUpIMWJDLUZ1bTBadkQyYlJ6dnNLOFB3UmswQnJXN1VBanBqNkhyaUFxU0ZqNW1kM3o5dzRuYU1lUjVxNWI2YTBqZnA3VUZJeE5fN2JaZm9FdHZQN1dWR0dnUHkxdDNLaXpfaw?oc=5",
-    "photo": 9336590,
-    "palette": "ocean",
-    "motif": "platform"
+    "photo": 16830015,
+    "palette": "teal",
+    "motif": "derrick"
   },
   {
     "title": "Petronas taps Velesto's Naga 3 for drilling",
@@ -54,24 +63,6 @@
     "motif": "wellhead"
   },
   {
-    "title": "PETRONAS, partners sign agreements for integrated development of Sarawak gas fields",
-    "source": "The Star",
-    "date": "2026-11-02",
-    "link": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPcDZxRlhIZU1DeklaTzQ3YVZQTkN1bFdhNzJEZHRKaV9iZ2xlTlFPclN2N2t3bFBkYVZ1VXZjeGlOcnA1R3lqdUhBLWdFQzVwa1I5VkFMRWhoSEd4aWE4cDZXNE1laVowd3BQQnNXZTRSeWZ2cHVkSlVSQVpkcWVSd29kSllzNVd2dVpZdVN5YW5GLXBwRGZobWswMXdMRExhdV9JUGNEdXhGQkhmT3duaVNyZTNYQ0FHQV9iQUE1YzVMTDV5U0lLSWI1dThNUlZRRF9ScXZBLWhiSGM?oc=5",
-    "photo": 9336586,
-    "palette": "teal",
-    "motif": "platform"
-  },
-  {
-    "title": "PETRONAS signs farm-out agreements for fields offshore Sarawak",
-    "source": "The Edge Malaysia",
-    "date": "2026-11-02",
-    "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5pV1hmUk1LdGg2ZWUwX2FFZzRtRUdUWXFQQ0stSHJMN0hJNjZWVk9GSEdUZDVFYV9UbG5yTVdXXzI0SGRIa3BZLWJoVnFET295?oc=5",
-    "photo": 9336586,
-    "palette": "teal",
-    "motif": "platform"
-  },
-  {
     "title": "T7 Global lands three-year offshore contract from Petronas-Eni venture",
     "source": "Splash247",
     "date": "2026-10-29",
@@ -88,5 +79,14 @@
     "photo": 15970028,
     "palette": "red",
     "motif": "pipeline"
+  },
+  {
+    "title": "Which Malaysian O&G stocks stand to gain from higher-for-longer oil prices?",
+    "source": "The Edge Malaysia",
+    "date": "2026-10-26",
+    "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFB4MzkxZEVRUjZSVlh0VDNfcXhKY2ZYcG80QnUzc2tHRjVsbHpPTDJfTW9UeGZvRWM1MjBTVWp3djFkbzVzd3picWVrN1Qwd0Rs?oc=5",
+    "photo": 9336590,
+    "palette": "ocean",
+    "motif": "platform"
   }
 ]
